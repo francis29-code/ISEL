@@ -2,10 +2,11 @@
 import numpy as np
 from matplotlib import pyplot as plt
 import scipy.io.wavfile as wav
+import sys
 # from soundPlay import soundPlay
-
+# print ("caminho absoluto: " + str(sys.path[0]))
 #caminho estático de gravações
-caminho = "C:\\Users\\Denga\\Desktop\\ISEL\\CPS\\"
+caminho = str(sys.path[0])+"\\"
 
 #variaveis constantes
 f = 3014.0
@@ -30,7 +31,7 @@ def spectrumSignal(freqS, sin):
     sinusoideFFT = np.fft.fft(sin)
     #shift recalcula os valores da frequencias
     shiftedFFT = np.fft.fftshift(sinusoideFFT)
-    t = np.arange(-fs/2,fs/2)
+    t = np.arange(-freqS/2,freqS/2)
     plt.plot(t,shiftedFFT)
     plt.title('Espectro do sinal')
     plt.xlabel('Frequencia')
@@ -86,7 +87,7 @@ def EX2A():
     plt.ylabel('Amplitude')
     plt.title('Sinusoide a 4khz')
     plt.show()
-    figure.savefig(caminho+'fre4khz.png')
+    figure.savefig(caminho+'EX2A.png')
 
     recordSignal('sinal4khz.wav',newFs, newSignal.astype('int16'))
 
@@ -96,13 +97,15 @@ def EX2A():
 
 def EX2B():
     newFs = 1000
-    figure = plt.plot()
-    recordSignal('sinaldevoz1khz.wav',newFs,data.astype('int16'))
+    newData = data[::8]
+    figure = plt.figure()
+    recordSignal('sinaldevoz1khz.wav',newFs,newData.astype('int16'))
     figure.add_subplot(211)
-    spectrumSignal(newFs, data)
+    spectrumSignal(newFs, newData[:newFs])
     figure.add_subplot(212)
-    spectrumSignal(fs, data)
+    spectrumSignal(fs, data[:fs])
     plt.show()
+    figure.savefig(caminho + 'EX2B.png')
 
 
 
