@@ -97,12 +97,27 @@ def EX2A():
 
 def EX2B():
     newFs = 1000
-    newData = data[::8]
+    newData = data[::fs/newFs]
+    newData1 = newData[:newFs]
+    newT = np.arange(0.,1.,1./newFs)
+    print("LENGHT DATA: " + str(len(newData1)))
+    print("LENGHT NEWT: " + str(len(newT)))
+    T = np.arange(0.,1.,1./fsRecord)
     figure = plt.figure()
+    figure.add_subplot(411)
+    plt.plot(T,data[:fsRecord])
+    plt.xlabel('Tempo')
+    plt.ylabel('Amplitude')
+    plt.title('Amostragem o sinal de voz com FS=8KHZ')
+    figure.add_subplot(412)
+    plt.plot(newT,newData1)
+    plt.xlabel('Tempo')
+    plt.ylabel('Amplitude')
+    plt.title('Amostragem o sinal de voz com FS=1KHZ')
     recordSignal('sinaldevoz1khz.wav',newFs,newData.astype('int16'))
-    figure.add_subplot(211)
+    figure.add_subplot(413)
     spectrumSignal(newFs, newData[:newFs])
-    figure.add_subplot(212)
+    figure.add_subplot(414)
     spectrumSignal(fs, data[:fs])
     plt.show()
     figure.savefig(caminho + 'EX2B.png')
