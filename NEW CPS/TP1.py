@@ -123,6 +123,8 @@ def EX2B():
     figure.savefig(caminho + 'EX2B.png')
 
 
+def EX3A():
+    figure = plt.figure()
 
 
 
