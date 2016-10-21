@@ -3,6 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 import scipy.io.wavfile as wav
 import sys
+import pylab as pyl
 # from soundPlay import soundPlay
 # print ("caminho absoluto: " + str(sys.path[0]))
 #caminho estático de gravações
@@ -97,39 +98,31 @@ def EX2A():
 
 def EX2B():
     newFs = 1000
-    newData = data[::fs/newFs]
-    newData1 = newData[:newFs]
+    #se queremos extrair apenas 1000 amostras num segundo
+    #dividimos a frequencia de amostragem do sinal pela frequencias
+    #de amostragem que queremos reconstruir o sinal
+    newData = data[:fsRecord]
+    newData1 = data[::fsRecord/newFs]
+    #arra de data com tamanho igual amostragem
+    newData_1k = newData1[:newFs]
+    #array de tempo igual a amostragem
     newT = np.arange(0.,1.,1./newFs)
-    print("LENGHT DATA: " + str(len(newData1)))
-    print("LENGHT NEWT: " + str(len(newT)))
-    T = np.arange(0.,1.,1./fsRecord)
-    figure = plt.figure()
-    figure.add_subplot(411)
-    plt.plot(T,data[:fsRecord])
-    plt.xlabel('Tempo')
-    plt.ylabel('Amplitude')
-    plt.title('Amostragem o sinal de voz com FS=8KHZ')
-    figure.add_subplot(412)
-    plt.plot(newT,newData1)
+    plt.plot(newT,newData_1k)
     plt.xlabel('Tempo')
     plt.ylabel('Amplitude')
     plt.title('Amostragem o sinal de voz com FS=1KHZ')
-    recordSignal('sinaldevoz1khz.wav',newFs,newData.astype('int16'))
-    figure.add_subplot(413)
-    spectrumSignal(newFs, newData[:newFs])
-    figure.add_subplot(414)
-    spectrumSignal(fs, data[:fs])
+    recordSignal('sinaldevoz1khz.wav',newFs,newData_1k.astype('int16'))
+    figure = plt.figure()
+    figure.add_subplot(211)
+    spectrumSignal(newFs, newData_1k)
+    figure.add_subplot(212)
+    spectrumSignal(fsRecord, data[:fsRecord])
     plt.show()
     figure.savefig(caminho + 'EX2B.png')
 
 
-def EX3A():
-    figure = plt.figure()
-
-
-
 if __name__ == "__main__":
-    # EX1A()
-    # EX1B()
-    # EX2A()
+    EX1A()
+    EX1B()
+    EX2A()
     EX2B()
