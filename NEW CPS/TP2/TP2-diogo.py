@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 
 
 def potenciaSinal(sinalAmostrado):
-    potencia = (1/len(sinalAmostrado))*sum(sinalAmostrado**2.)
+    potencia = (1./len(sinalAmostrado))*np.sum(sinalAmostrado**2.)
     return potencia
 
 
@@ -31,17 +31,23 @@ Vmax = 1
 
 VD,NQ=createTable(R,Vmax)
 
-print "Niveis de Quantificação : " + str(NQ)
-print "Valores de Decisão : " + str(VD)
-
 SinalRampa=np.arange(-1,1,0.01)
 
 potencia = potenciaSinal(SinalRampa)
+
 SQ,IQU=quantificacao(SinalRampa , NQ, VD)
 
+print "------------------------------------------------------------------------"
+print "Niveis de Quantificação : " + str(NQ)
+print "------------------------------------------------------------------------"
+print "Valores de Decisão : " + str(VD)
+print "------------------------------------------------------------------------"
 print "Potencia do sinal: " + str(potencia)
+print "------------------------------------------------------------------------"
 print "sinalQuantificado: " + str(SQ)
+print "------------------------------------------------------------------------"
 print "Indices de Quantificação utilizados: " + str(IQU)
+print "------------------------------------------------------------------------"
 
 T=np.arange(0,len(SQ))
 plt.grid(True)
