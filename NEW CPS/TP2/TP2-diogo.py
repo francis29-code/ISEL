@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import numpy as np
+from matplotlib import pyplot as plt
 
 R = 3
 Vmax = 1
@@ -21,15 +22,24 @@ def quantificacao(sinalAmostrado, NQ, VD):
     aux = np.zeros(len(sinalAmostrado))
     for a in range(len(sinalAmostrado)):
         indice = sinalAmostrado[a] < VD
-        print "indice: " + str(indice)
         indiceTrue = np.nonzero(indice)
-        print "indiceTrue: " + str(indiceTrue[0])
         aux[a] = indiceTrue[0][0]
         sinalQuantificado[a] = NQ[aux[a]-1]
 
     return sinalQuantificado , aux
 
-SQ,VQ=quantificacao([0.3,0.6,-0.3,-.6,.8] , NQ, VD)
+
+SinalRampa=np.arange(-1,1,0.01)
+
+SQ,VQ=quantificacao(SinalRampa , NQ, VD)
 
 print "sinalQuantificado: " + str(SQ)
 print "Valores de Quantificação utilizados: " + str(VQ)
+
+T=np.arange(0,len(SQ))
+plt.grid(True)
+
+plt.plot(T,SQ, label='SinalQuantificado')
+plt.plot(T,SinalRampa, label='SinalRampa')
+plt.legend(loc='lower right')
+plt.show()
