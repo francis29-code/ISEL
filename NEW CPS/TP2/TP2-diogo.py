@@ -3,17 +3,21 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
+#-------------------Funções-------------------
+#cria um sinal em rampa como por exemplo y=x
 def potenciaSinal(sinalAmostrado):
     potencia = (1./len(sinalAmostrado))*np.sum(sinalAmostrado**2.)
     return potencia
 
-
+#retorna dois numpy arrays com os valores de
+#decisão e com os niveis de quantificação
 def createTable(R, Vmax):
     valoresDecisao = np.arange(-Vmax , Vmax+((2.*Vmax)/(2.**R)) , (2.*Vmax)/(2.**R))
     niveisQuantificacao = np.arange(-Vmax+(Vmax/(2.**R)) , Vmax , (2.*Vmax)/(2.**R))
     return valoresDecisao, niveisQuantificacao
 
-
+#retorna dois numpy arrays com o sinal quantificado
+#e outro com os indices dos niveis de quantificação usados
 def quantificacao(sinalAmostrado, NQ, VD):
     sinalQuantificado = np.zeros(len(sinalAmostrado))
     aux = np.zeros(len(sinalAmostrado))
@@ -26,32 +30,41 @@ def quantificacao(sinalAmostrado, NQ, VD):
     return sinalQuantificado , aux
 
 
+
+
+
+
+
+#--------------------Vareaveis-----------------------
 R = 3
 Vmax = 1
-
-VD,NQ=createTable(R,Vmax)
-
 SinalRampa=np.arange(-1,1,0.01)
 
+
+#--------------Execução de funções-------------------
+VD,NQ=createTable(R,Vmax)
+SQ,IQU=quantificacao(SinalRampa , NQ, VD)
 potencia = potenciaSinal(SinalRampa)
 
-SQ,IQU=quantificacao(SinalRampa , NQ, VD)
 
+#----------------------Prints------------------------
 print "------------------------------------------------------------------------"
-print "Niveis de Quantificação : " + str(NQ)
+print "Niveis de Quantificação: \n" + str(NQ)
 print "------------------------------------------------------------------------"
-print "Valores de Decisão : " + str(VD)
+print "Valores de Decisão: \n" + str(VD)
 print "------------------------------------------------------------------------"
 print "Potencia do sinal: " + str(potencia)
 print "------------------------------------------------------------------------"
-print "sinalQuantificado: " + str(SQ)
+print "sinalQuantificado: \n" + str(SQ)
 print "------------------------------------------------------------------------"
-print "Indices de Quantificação utilizados: " + str(IQU)
+print "Indices de Quantificação utilizados: \n" + str(IQU)
 print "------------------------------------------------------------------------"
 
-T=np.arange(0,len(SQ))
+
+#-----------------------Plots-----------------------
+Tsq=np.arange(0,len(SQ))
 plt.grid(True)
-plt.plot(T,SQ, label='SinalQuantificado')
-plt.plot(T,SinalRampa, label='SinalRampa')
+plt.plot(Tsq,SQ, label='SinalQuantificado')
+plt.plot(Tsq,SinalRampa, label='SinalRampa')
 plt.legend(loc='lower right')
 plt.show()
