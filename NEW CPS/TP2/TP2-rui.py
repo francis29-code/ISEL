@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 import scipy.io.wavfile as wav
 import sys
-import pylab as plb
+import pylab as plb 
 
 def potenciaSinal(sinalAmostrado):
     potencia = (1/len(sinalAmostrado))*np.sum(sinalAmostrado**2.)
@@ -10,7 +10,7 @@ def potenciaSinal(sinalAmostrado):
 
 def erroQuantificacao(sinalOriginal, sinalQuantificado):
     erroSinal = np.zeros(len(sinalOriginal))
-    
+
     return erroSinal
 
 def potenciaErroQuant():
