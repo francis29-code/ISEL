@@ -8,10 +8,22 @@ def potenciaSinal(sinalAmostrado):
     potencia = (1/len(sinalAmostrado))*np.sum(sinalAmostrado**2.)
     return potencia
 
-def SNRTeorico(potencia,R):
-    valor = 6*R + 10*np.log()
+def erroQuantificacao(sinalOriginal, sinalQuantificado):
+    erroSinal = np.zeros(len(sinalOriginal))
+    
+    return erroSinal
+
+def potenciaErroQuant():
+
+    return potenciaErro
+
+def SNRTeorico(potencia,R,Vmax):
+    valor = 6*R + 10*np.log((3*potencia)/Vmax**2)
     return valor
 
+def SNRPratico(potenciaSinal, potenciaErro):
+    valor = 10*np.log(potenciaSinal/potenciaErro)
+    return valor
 
 def createTable(R, Vmax):
     valoresDecisao = np.arange(-Vmax , Vmax+((2.*Vmax)/(2.**R)) , (2.*Vmax)/(2.**R))
@@ -54,3 +66,6 @@ plt.plot(T,SQ, label='SinalQuantificado')
 plt.plot(T,SinalRampa, label='SinalRampa')
 plt.legend(loc='lower right')
 plt.show()
+
+
+if __name__ == "__main__":
