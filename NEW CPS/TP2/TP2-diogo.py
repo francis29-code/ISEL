@@ -2,19 +2,16 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-R = 3
-Vmax = 1
+
+def potenciaSinal(sinalAmostrado):
+    potencia = (1/len(sinalAmostrado))*sum(sinalAmostrado**2.)
+    return potencia
+
 
 def createTable(R, Vmax):
     valoresDecisao = np.arange(-Vmax , Vmax+((2.*Vmax)/(2.**R)) , (2.*Vmax)/(2.**R))
     niveisQuantificacao = np.arange(-Vmax+(Vmax/(2.**R)) , Vmax , (2.*Vmax)/(2.**R))
     return valoresDecisao, niveisQuantificacao
-
-
-VD,NQ=createTable(R,Vmax)
-
-print "Niveis de Quantificação : " + str(NQ)
-print "Valores de Decisão : " + str(VD)
 
 
 def quantificacao(sinalAmostrado, NQ, VD):
@@ -29,16 +26,25 @@ def quantificacao(sinalAmostrado, NQ, VD):
     return sinalQuantificado , aux
 
 
+R = 3
+Vmax = 1
+
+VD,NQ=createTable(R,Vmax)
+
+print "Niveis de Quantificação : " + str(NQ)
+print "Valores de Decisão : " + str(VD)
+
 SinalRampa=np.arange(-1,1,0.01)
 
-SQ,VQ=quantificacao(SinalRampa , NQ, VD)
+potencia = potenciaSinal(SinalRampa)
+SQ,IQU=quantificacao(SinalRampa , NQ, VD)
 
+print "Potencia do sinal: " + str(potencia)
 print "sinalQuantificado: " + str(SQ)
-print "Valores de Quantificação utilizados: " + str(VQ)
+print "Indices de Quantificação utilizados: " + str(IQU)
 
 T=np.arange(0,len(SQ))
 plt.grid(True)
-
 plt.plot(T,SQ, label='SinalQuantificado')
 plt.plot(T,SinalRampa, label='SinalRampa')
 plt.legend(loc='lower right')
