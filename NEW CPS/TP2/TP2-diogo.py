@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 from matplotlib import pyplot as plt
+import scipy.io.wavfile as wav
+import sys
+import pylab as pylab
 
+caminho = str(sys.path[0])+"\\"
 
 #-------------------Funções-------------------
 #calcula a potencia do sinal amostrado
@@ -42,11 +46,11 @@ def quantificacao(sinalAmostrado, NQ, VD):
     sinalQuantificado = np.zeros(len(sinalAmostrado))
     indiceQuant = np.zeros(len(sinalAmostrado))
     for a in range(len(sinalAmostrado)):
-        indice = sinalAmostrado[a] < VD
+        indice = sinalAmostrado[a] <= VD
         indiceTrue = np.nonzero(indice)
-        indiceQuant[a] = indiceTrue[0][0]-1
-        sinalQuantificado[a] = NQ[indiceQuant[a]]
-
+        aux = int(indiceTrue[0][0]-1)
+        indiceQuant[a] = aux
+        sinalQuantificado[a] = NQ[aux]
     return sinalQuantificado , indiceQuant.astype('int16')
 
 #Codifica em binario o array de Indices
@@ -62,25 +66,55 @@ def codificaSinal(IQ, R):
         sinalCodificado[count+1]=aux[1]
         sinalCodificado[count+2]=aux[2]
         count+=3
-
     return sinalCodificado.astype('int16')
 
 
 
+def recordSignal(name, freq, signal):
+    wav.write(caminho+name,freq,signal.astype('int16'))
+
+#-------------Reverse MotherFucker-------------------
+
+def descodificaSinal(sinalCodificado, R):
+    sinalDescodificado = np.zeros(len(sinalCodificado)/R)
+    count = 0
+    for i in range(0,len(sinalCodificado),3):
+        binario = str(sinalCodificado[i])+str(sinalCodificado[i+1])+str(sinalCodificado[i+2])
+        sinalDescodificado[count]=int(binario,2)
+        count+=1
+
+    return sinalDescodificado.astype('int16')
+
+def quantificacaoInversa(sinalDescodificado,niveisQuantificacao):
+    sinalQuantInv = np.zeros(len(sinalDescodificado))
+    for i in range(len(sinalDescodificado)):
+        sinalQuantInv[i]=niveisQuantificacao[sinalDescodificado[i]]
+    return sinalQuantInv
 
 #--------------------Variaveis-----------------------
 R = 3
 Vmax = 1
 SinalRampa=np.arange(-1,1,0.01)
+fs = 8000.
+f = 3014.
+T = np.arange(0,1,1/fs)
+A = 1
 
+y = A*np.cos(2*np.pi*f*T)
 
 #--------------Execução de funções-------------------
-VD,NQ=createTable(R,Vmax)
-SQ,IQU=quantificacao(SinalRampa , NQ, VD)
+VD,NQ = createTable(R,Vmax)
+SQ,IQU = quantificacao(SinalRampa , NQ, VD)
 potencia = potenciaSinal(SinalRampa)
 erro = erroQuantificacao(SinalRampa,SQ)
 potenciaErro = potenciaErroQuant(erro)
 sinalCodificado = codificaSinal(IQU, R)
+sinalDescodificado = descodificaSinal(sinalCodificado,R)
+sinalQuantInv = quantificacaoInversa(sinalDescodificado,NQ)
+recordSignal('sinosoide.wav',fs,SinalRampa)
+recordSignal('sinalQuantificado.wav',fs,SQ)
+recordSignal('sinalQuantInv.wav',fs,sinalQuantInv)
+
 
 #----------------------Prints------------------------
 print ("------------------------------------------------------------------------")
@@ -100,6 +134,11 @@ print ("Potencia do Erro de Quantificação: \n" + str(potenciaErro))
 print ("------------------------------------------------------------------------")
 print ("Codificação: \n" + str(sinalCodificado))
 print ("------------------------------------------------------------------------")
+print ("Descodificação: \n" + str(sinalDescodificado))
+print ("------------------------------------------------------------------------")
+print ("Quantificação Inversa: \n" + str(sinalQuantInv))
+print ("------------------------------------------------------------------------")
+
 
 
 #-----------------------Plots-----------------------
