@@ -45,12 +45,23 @@ def createTable(R, Vmax):
 def quantificacao(sinalAmostrado, NQ, VD):
     sinalQuantificado = np.zeros(len(sinalAmostrado))
     indiceQuant = np.zeros(len(sinalAmostrado))
+    maximo = np.amax(abs(sinalAmostrado))
+    print(NQ)
+    print(VD)
     for a in range(len(sinalAmostrado)):
-        indice = sinalAmostrado[a] <= VD
-        indiceTrue = np.nonzero(indice)
-        aux = int(indiceTrue[0][0]-1)
-        indiceQuant[a] = aux
-        sinalQuantificado[a] = NQ[aux]
+        print(sinalAmostrado[a])
+        indice =  VD > sinalAmostrado[a]
+        print(indice)
+        if(sinalAmostrado[a]==maximo):
+            indiceQuant[a] = 7
+            sinalQuantificado[a] = NQ[7]
+        else:
+            indiceTrue = np.nonzero(indice)
+            print(indiceTrue)
+            aux = int(indiceTrue[0][0]-1)
+            print(aux)
+            indiceQuant[a] = aux
+            sinalQuantificado[a] = NQ[aux]
     return sinalQuantificado , indiceQuant.astype('int16')
 
 #Codifica em binario o array de Indices
@@ -58,11 +69,17 @@ def quantificacao(sinalAmostrado, NQ, VD):
 #os valores do array de indices
 def codificaSinal(IQ, R):
     sinalCodificado = np.zeros(len(IQ)*R)
+    # print("SINAL A ZEROS/////////////////////////////////////////////")
+    # print(sinalCodificado.astype('int16'))
     count=0
     binario = '{0:0'+str(R)+'b}'
     for i in range(len(IQ)):
+        # print(IQ[i])
         aux = binario.format(IQ[i])
-        sinalCodificado[count]=aux[0]
+        # print(aux)
+        # print("resultado type: " + str(type(aux[0]) is str))
+        # print("resultado type: " + str(type(sinalCodificado[count]) is str))
+        sinalCodificado[count]=int(aux[0])
         sinalCodificado[count+1]=aux[1]
         sinalCodificado[count+2]=aux[2]
         count+=3
@@ -91,60 +108,68 @@ def quantificacaoInversa(sinalDescodificado,niveisQuantificacao):
         sinalQuantInv[i]=niveisQuantificacao[sinalDescodificado[i]]
     return sinalQuantInv
 
-#--------------------Variaveis-----------------------
-R = 3
-Vmax = 1
-SinalRampa=np.arange(-1,1,0.01)
-fs = 8000.
-f = 3014.
-T = np.arange(0,1,1/fs)
-A = 1
-
-y = A*np.cos(2*np.pi*f*T)
-
-#--------------Execução de funções-------------------
-VD,NQ = createTable(R,Vmax)
-SQ,IQU = quantificacao(SinalRampa , NQ, VD)
-potencia = potenciaSinal(SinalRampa)
-erro = erroQuantificacao(SinalRampa,SQ)
-potenciaErro = potenciaErroQuant(erro)
-sinalCodificado = codificaSinal(IQU, R)
-sinalDescodificado = descodificaSinal(sinalCodificado,R)
-sinalQuantInv = quantificacaoInversa(sinalDescodificado,NQ)
-recordSignal('sinosoide.wav',fs,SinalRampa)
-recordSignal('sinalQuantificado.wav',fs,SQ)
-recordSignal('sinalQuantInv.wav',fs,sinalQuantInv)
 
 
-#----------------------Prints------------------------
-print ("------------------------------------------------------------------------")
-print ("Niveis de Quantificação: \n" + str(NQ))
-print ("------------------------------------------------------------------------")
-print ("Valores de Decisão: \n" + str(VD))
-print ("------------------------------------------------------------------------")
-print ("Potencia do sinal: " + str(potencia))
-print ("------------------------------------------------------------------------")
-print ("sinalQuantificado: \n" + str(SQ))
-print ("------------------------------------------------------------------------")
-print ("Indices de Quantificação utilizados: \n" + str(IQU))
-print ("------------------------------------------------------------------------")
-print ("Erro de Quantificação: \n" + str(erro))
-print ("------------------------------------------------------------------------")
-print ("Potencia do Erro de Quantificação: \n" + str(potenciaErro))
-print ("------------------------------------------------------------------------")
-print ("Codificação: \n" + str(sinalCodificado))
-print ("------------------------------------------------------------------------")
-print ("Descodificação: \n" + str(sinalDescodificado))
-print ("------------------------------------------------------------------------")
-print ("Quantificação Inversa: \n" + str(sinalQuantInv))
-print ("------------------------------------------------------------------------")
+if __name__=="__main__":
+
+    #--------------------Variaveis-----------------------
+    R = 3
+    Vmax = 1
+    SinalRampa=np.arange(-1,1,0.01)
+    fs = 8000
+    f = 3014.
+    T = np.arange(0,1,1/fs)
+    A = 1000
+
+    y = A*np.cos(2*np.pi*f*T)
+
+    #--------------Execução de funções-------------------
+    VD,NQ = createTable(R,np.amax(abs(y)))
+    SQ,IQU = quantificacao(y , NQ, VD)
+    print("TAMANHO SINAL RAMPA: " + str(len(y)))
+    print("TAMANHO SINAL IQU: " + str(len(IQU)))
+    print("INDICES QUANTIFICACAO: ")
+    print(IQU)
+    potencia = potenciaSinal(y)
+    erro = erroQuantificacao(y,SQ)
+    potenciaErro = potenciaErroQuant(erro)
+    sinalCodificado = codificaSinal(IQU, R)
+    sinalDescodificado = descodificaSinal(sinalCodificado,R)
+    sinalQuantInv = quantificacaoInversa(sinalDescodificado,NQ)
+    recordSignal('sinosoide.wav',fs,y)
+    recordSignal('sinalQuantificado.wav',fs,SQ)
+    recordSignal('sinalQuantInv.wav',fs,sinalQuantInv)
+
+
+    #----------------------Prints------------------------
+    print ("------------------------------------------------------------------------")
+    print ("Niveis de Quantificação: \n" + str(NQ))
+    print ("------------------------------------------------------------------------")
+    print ("Valores de Decisão: \n" + str(VD))
+    print ("------------------------------------------------------------------------")
+    print ("Potencia do sinal: " + str(potencia))
+    print ("------------------------------------------------------------------------")
+    print ("sinalQuantificado: \n" + str(SQ))
+    print ("------------------------------------------------------------------------")
+    print ("Indices de Quantificação utilizados: \n" + str(IQU))
+    print ("------------------------------------------------------------------------")
+    print ("Erro de Quantificação: \n" + str(erro))
+    print ("------------------------------------------------------------------------")
+    print ("Potencia do Erro de Quantificação: \n" + str(potenciaErro))
+    print ("------------------------------------------------------------------------")
+    print ("Codificação: \n" + str(sinalCodificado))
+    print ("------------------------------------------------------------------------")
+    print ("Descodificação: \n" + str(sinalDescodificado))
+    print ("------------------------------------------------------------------------")
+    print ("Quantificação Inversa: \n" + str(sinalQuantInv))
+    print ("------------------------------------------------------------------------")
 
 
 
-#-----------------------Plots-----------------------
-Tsq=np.arange(0,len(SQ))
-plt.grid(True)
-plt.plot(Tsq,SQ, label='SinalQuantificado')
-plt.plot(Tsq,SinalRampa, label='SinalRampa')
-plt.legend(loc='lower right')
-plt.show()
+    #-----------------------Plots-----------------------
+    Tsq=np.arange(0,len(SQ))
+    plt.grid(True)
+    plt.plot(Tsq,SQ, label='SinalQuantificado')
+    plt.plot(Tsq,y, label='SinalRampa')
+    plt.legend(loc='lower right')
+    plt.show()
