@@ -70,8 +70,8 @@ def codificaSinal(IQ, R):
     for i in range(len(IQ)):
         aux = binario.format(IQ[i])
         sinalCodificado[count]=int(aux[0])
-        sinalCodificado[count+1]=aux[1]
-        sinalCodificado[count+2]=aux[2]
+        sinalCodificado[count+1]=int(aux[1])
+        sinalCodificado[count+2]=int(aux[2])
         count+=3
     return sinalCodificado.astype('int16')
 
@@ -100,10 +100,7 @@ def quantificacaoInversa(sinalDescodificado,niveisQuantificacao):
         sinalQuantInv[i]=niveisQuantificacao[sinalDescodificado[i]]
     return sinalQuantInv
 
-
-
-if __name__=="__main__":
-
+def CORRETUDO():
     #--------------------Variaveis-----------------------
     R = 8
     Vmax = 1
@@ -161,5 +158,101 @@ if __name__=="__main__":
     # plt.plot(Tsq,SR, label='SinalRampa')
     # plt.legend(loc='lower right')
     # plt.show()
+
+
+def EX3AQ():
+    R = 3
+    SR=np.arange(-1,1,0.0001)
+    VD,NQ = createTable(R,np.amax(abs(SR)))
+    SQ,IQU = quantificacao(SR , NQ, VD)
+    Tsq=np.arange(0,len(SQ))
+    plt.grid(True)
+    plt.plot(Tsq,SQ, label='SinalQuantificado')
+    plt.plot(Tsq,SR, label='SinalRampa')
+    plt.legend(loc='lower right')
+    plt.show()
+
+def EX3BQ():
+    R = 3
+    SR=np.arange(-1,1,0.0001)
+    VD,NQ = createTable(R,np.amax(abs(SR)))
+    SQ,IQU = quantificacao(SR , NQ, VD)
+    erro = erroQuantificacao(SR,SQ)
+    plt.hist(erro)
+    pylab.ylim([1950,2050])
+    plt.show()
+
+def EX3CQ():
+    R = [3,4,5,6,7,8]
+    SR=np.arange(-1,1,0.0001)
+    arraySNRpratico = np.zeros(len(R))
+    arraySNRteorico = np.zeros(len(R))
+    for i in range(len(R)):
+        VD,NQ = createTable(R[i],np.amax(abs(SR)))
+        SQ,IQU = quantificacao(SR , NQ, VD)
+        erro = erroQuantificacao(SR,SQ)
+        potenciaErro = potenciaErroQuant(erro)
+        potencia = potenciaSinal(SR)
+        auxSNRP = SNRPratico(potencia,potenciaErro)
+        arraySNRpratico[i] = auxSNRP
+        auxSNRT = SNRTeorico(potencia,R[i],np.amax(abs(SR)))
+        arraySNRteorico[i] = auxSNRT
+
+    B = np.vstack((arraySNRteorico,arraySNRpratico))
+    fig,axs =plt.subplots(1,1)
+    clust_data = B
+    collabel=("R=3", "R=4", "R=5", "R=6", "R=7", "R=8")
+    rowlabel=("SNRTeorico","SNRPratico")
+    axs.axis('off')
+    the_table = axs.table(cellText=clust_data,colLabels=collabel,rowLabels=rowlabel,loc='center')
+    plt.show()
+
+def EX4AQ():
+    fsRecord, data = wav.read(caminho + 'sinaldevoz8khz.wav')
+    plt.hist(data)
+    plt.show()
+
+def EX4BQ():
+    fsRecord, data = wav.read(caminho + 'sinaldevoz8khz.wav')
+    plt.hist(data)
+    plt.show()
+
+def EX4CQ():
+    R = [3,4,5,6,7,8]
+    fsRecord, data = wav.read(caminho + 'sinaldevoz8khz.wav')
+    arraySNRpratico = np.zeros(len(R))
+    arraySNRteorico = np.zeros(len(R))
+    for i in range(len(R)):
+        VD,NQ = createTable(R[i],np.amax(abs(data)))
+        SQ,IQU = quantificacao(data , NQ, VD)
+        erro = erroQuantificacao(data,SQ)
+        potenciaErro = potenciaErroQuant(erro)
+        potencia = potenciaSinal(data)
+        auxSNRP = SNRPratico(potencia,potenciaErro)
+        arraySNRpratico[i] = auxSNRP
+        auxSNRT = SNRTeorico(potencia,R[i],np.amax(abs(data)))
+        arraySNRteorico[i] = auxSNRT
+
+    B = np.vstack((arraySNRteorico,arraySNRpratico))
+    fig,axs =plt.subplots(2,1)
+    clust_data = B
+    collabel=("R=3", "R=4", "R=5", "R=6", "R=7", "R=8")
+    rowlabel=("SNRTeorico","SNRPratico")
+    axs[0].axis('off')
+    the_table = axs[0].table(cellText=clust_data,colLabels=collabel,rowLabels=rowlabel,loc='center')
+
+    axs[1].plot(R,arraySNRteorico,'o',label='SNRteorico')
+    axs[1].plot(R,arraySNRpratico,'o',label='SNRpratico')
+    axs[1].legend(loc='upper left')
+    plt.show()
+
+if __name__=="__main__":
+    # EX3AQ()
+    # EX3BQ()
+    # EX3CQ()
+    # EX4AQ()
+    # EX4BQ()
+    EX4CQ()
+
 
 print("--- %s seconds ---" % (time.time() - start_time))
