@@ -1,9 +1,13 @@
-# -*- coding: utf-8 -*-
 import numpy as np
 from matplotlib import pyplot as plt
 import scipy.io.wavfile as wav
 import sys
 import pylab as pylab
+import time
+
+start_time = time.time()
+
+
 
 caminho = str(sys.path[0])+"\\"
 
@@ -46,20 +50,14 @@ def quantificacao(sinalAmostrado, NQ, VD):
     sinalQuantificado = np.zeros(len(sinalAmostrado))
     indiceQuant = np.zeros(len(sinalAmostrado))
     maximo = np.amax(abs(sinalAmostrado))
-    print(NQ)
-    print(VD)
     for a in range(len(sinalAmostrado)):
-        print(sinalAmostrado[a])
         indice =  VD > sinalAmostrado[a]
-        print(indice)
         if(sinalAmostrado[a]==maximo):
-            indiceQuant[a] = 7
-            sinalQuantificado[a] = NQ[7]
+            indiceQuant[a] = len(NQ)-1
+            sinalQuantificado[a] = NQ[len(NQ)-1]
         else:
             indiceTrue = np.nonzero(indice)
-            print(indiceTrue)
             aux = int(indiceTrue[0][0]-1)
-            print(aux)
             indiceQuant[a] = aux
             sinalQuantificado[a] = NQ[aux]
     return sinalQuantificado , indiceQuant.astype('int16')
@@ -69,16 +67,10 @@ def quantificacao(sinalAmostrado, NQ, VD):
 #os valores do array de indices
 def codificaSinal(IQ, R):
     sinalCodificado = np.zeros(len(IQ)*R)
-    # print("SINAL A ZEROS/////////////////////////////////////////////")
-    # print(sinalCodificado.astype('int16'))
     count=0
     binario = '{0:0'+str(R)+'b}'
     for i in range(len(IQ)):
-        # print(IQ[i])
         aux = binario.format(IQ[i])
-        # print(aux)
-        # print("resultado type: " + str(type(aux[0]) is str))
-        # print("resultado type: " + str(type(sinalCodificado[count]) is str))
         sinalCodificado[count]=int(aux[0])
         sinalCodificado[count+1]=aux[1]
         sinalCodificado[count+2]=aux[2]
@@ -95,8 +87,10 @@ def recordSignal(name, freq, signal):
 def descodificaSinal(sinalCodificado, R):
     sinalDescodificado = np.zeros(len(sinalCodificado)/R)
     count = 0
-    for i in range(0,len(sinalCodificado),3):
-        binario = str(sinalCodificado[i])+str(sinalCodificado[i+1])+str(sinalCodificado[i+2])
+    binario = ''
+    for i in range(0,len(sinalCodificado),R):
+        for x in range(0,R):
+            binario += str(sinalCodificado[x])
         sinalDescodificado[count]=int(binario,2)
         count+=1
 
@@ -113,10 +107,10 @@ def quantificacaoInversa(sinalDescodificado,niveisQuantificacao):
 if __name__=="__main__":
 
     #--------------------Variaveis-----------------------
-    R = 3
+    R = 8
     Vmax = 1
-    SinalRampa=np.arange(-1,1,0.01)
-    fs = 8000
+    SR=np.arange(-1,1,0.0001)
+    fs = 1000
     f = 3014.
     T = np.arange(0,1,1/fs)
     A = 1000
@@ -124,52 +118,50 @@ if __name__=="__main__":
     y = A*np.cos(2*np.pi*f*T)
 
     #--------------Execução de funções-------------------
-    VD,NQ = createTable(R,np.amax(abs(y)))
-    SQ,IQU = quantificacao(y , NQ, VD)
-    print("TAMANHO SINAL RAMPA: " + str(len(y)))
-    print("TAMANHO SINAL IQU: " + str(len(IQU)))
-    print("INDICES QUANTIFICACAO: ")
-    print(IQU)
-    potencia = potenciaSinal(y)
-    erro = erroQuantificacao(y,SQ)
+    VD,NQ = createTable(R,np.amax(abs(SR)))
+    SQ,IQU = quantificacao(SR , NQ, VD)
+    potencia = potenciaSinal(SR)
+    erro = erroQuantificacao(SR,SQ)
     potenciaErro = potenciaErroQuant(erro)
     sinalCodificado = codificaSinal(IQU, R)
     sinalDescodificado = descodificaSinal(sinalCodificado,R)
     sinalQuantInv = quantificacaoInversa(sinalDescodificado,NQ)
-    recordSignal('sinosoide.wav',fs,y)
+    recordSignal('sinosoide.wav',fs,SR)
     recordSignal('sinalQuantificado.wav',fs,SQ)
     recordSignal('sinalQuantInv.wav',fs,sinalQuantInv)
 
 
     #----------------------Prints------------------------
     print ("------------------------------------------------------------------------")
-    print ("Niveis de Quantificação: \n" + str(NQ))
+    print ("Niveis de Quantificacao: \n" + str(NQ))
     print ("------------------------------------------------------------------------")
-    print ("Valores de Decisão: \n" + str(VD))
+    print ("Valores de Decisao: \n" + str(VD))
     print ("------------------------------------------------------------------------")
     print ("Potencia do sinal: " + str(potencia))
     print ("------------------------------------------------------------------------")
     print ("sinalQuantificado: \n" + str(SQ))
     print ("------------------------------------------------------------------------")
-    print ("Indices de Quantificação utilizados: \n" + str(IQU))
+    print ("Indices de Quantificacao utilizados: \n" + str(IQU))
     print ("------------------------------------------------------------------------")
-    print ("Erro de Quantificação: \n" + str(erro))
+    print ("Erro de Quantificacao: \n" + str(erro))
     print ("------------------------------------------------------------------------")
-    print ("Potencia do Erro de Quantificação: \n" + str(potenciaErro))
+    print ("Potencia do Erro de Quantificacao: \n" + str(potenciaErro))
     print ("------------------------------------------------------------------------")
-    print ("Codificação: \n" + str(sinalCodificado))
+    print ("Codificacao: \n" + str(sinalCodificado))
     print ("------------------------------------------------------------------------")
-    print ("Descodificação: \n" + str(sinalDescodificado))
+    print ("Descodificacao: \n" + str(sinalDescodificado))
     print ("------------------------------------------------------------------------")
-    print ("Quantificação Inversa: \n" + str(sinalQuantInv))
+    print ("Quantificacao Inversa: \n" + str(sinalQuantInv))
     print ("------------------------------------------------------------------------")
 
 
 
     #-----------------------Plots-----------------------
-    Tsq=np.arange(0,len(SQ))
-    plt.grid(True)
-    plt.plot(Tsq,SQ, label='SinalQuantificado')
-    plt.plot(Tsq,y, label='SinalRampa')
-    plt.legend(loc='lower right')
-    plt.show()
+    # Tsq=np.arange(0,len(SQ))
+    # plt.grid(True)
+    # plt.plot(Tsq,SQ, label='SinalQuantificado')
+    # plt.plot(Tsq,SR, label='SinalRampa')
+    # plt.legend(loc='lower right')
+    # plt.show()
+
+print("--- %s seconds ---" % (time.time() - start_time))
