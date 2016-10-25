@@ -7,8 +7,6 @@ import time
 
 start_time = time.time()
 
-
-
 caminho = str(sys.path[0])+"\\"
 
 #-------------------Funções-------------------
