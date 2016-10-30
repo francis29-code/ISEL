@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import numpy as np
 from matplotlib import pyplot as plt
 import scipy.io.wavfile as wav
@@ -252,7 +253,7 @@ if __name__=="__main__":
     # EX3CQ()
     # EX4AQ()
     # EX4BQ()
-    EX4CQ()
+    # EX4CQ()
 
 
 print("--- %s seconds ---" % (time.time() - start_time))
