@@ -247,6 +247,9 @@ def EX4CQ():
     axs[1].legend(loc='upper left')
     plt.show()
 
+def EX2C():
+
+
 if __name__=="__main__":
     # EX3AQ()
     # EX3BQ()
