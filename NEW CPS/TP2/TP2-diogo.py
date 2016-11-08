@@ -23,7 +23,7 @@ def potenciaErroQuant(erroQuantificado):
 
 #calcula o SNR teorico
 def SNRTeorico(potencia,R,Vmax):
-    valor = 6*R + 10*np.log((3*potencia)/Vmax**2)
+    valor = 6.s*R + 10.*np.log((3.*potencia)/Vmax**2.)
     return valor
 
 #calcula o SNR pratico
@@ -215,7 +215,17 @@ def EX4AQ():
 
 def EX4BQ():
     fsRecord, data = wav.read(caminho + 'sinaldevoz8khz.wav')
-    plt.hist(data)
+
+    VD,NQ = createTable(8,np.amax(abs(data)))
+    SQ,IQU = quantificacao(data , NQ, VD)
+    SQanterior = np.zeros(len(SQ))
+
+    for i in range(len(SQ)):
+        if(i==len(SQ)-1):
+            break
+        SQanterior[i+1] = SQ[i]
+
+    plt.plot(SQanterior,SQ,'o r')
     plt.show()
 
 def EX4CQ():
@@ -248,6 +258,7 @@ def EX4CQ():
     plt.show()
 
 def EX2C():
+    R=[3,4,5,6,7,8]
 
 
 if __name__=="__main__":
@@ -256,7 +267,7 @@ if __name__=="__main__":
     # EX3CQ()
     # EX4AQ()
     # EX4BQ()
-    # EX4CQ()
+    EX4CQ()
 
 
 print("--- %s seconds ---" % (time.time() - start_time))
