@@ -54,6 +54,7 @@ def quantificacao(sinalAmostrado, NQ, VD):
     indiceQuant = np.zeros(len(sinalAmostrado))
     maximo = np.amax(abs(sinalAmostrado))
     for a in range(len(sinalAmostrado)):
+        print("Amostra do sinal n_" + str(a) +": " + str(sinalAmostrado[a]))
         indice =  VD > sinalAmostrado[a]
         if(sinalAmostrado[a]==maximo):
             indiceQuant[a] = len(NQ)-1
@@ -63,6 +64,11 @@ def quantificacao(sinalAmostrado, NQ, VD):
             aux = int(indiceTrue[0][0]-1)
             indiceQuant[a] = aux
             sinalQuantificado[a] = NQ[aux]
+            print("Valor de quantificacao n_" +str(a)+ ": " + str(NQ[aux]))
+            print("Indice de quantificacao: n_" +str(a)+ ": " + str(aux))
+            print("\n")
+        if(a == 20): break
+
     return sinalQuantificado , indiceQuant.astype('int16')
 
 #Codifica em binario o array de Indices
@@ -73,10 +79,15 @@ def codificaSinal(IQ, R):
     count=0
     binario = '{0:0'+str(R)+'b}'
     for i in range(len(IQ)):
+        # print("valor do indice de quantificacao: " +str(IQ[i]))
         aux = binario.format(IQ[i])
+        # print("valor de indice em binario: " + str(aux))
+        # print("\n")
         for x in range(0,R):
             sinalCodificado[count+x]=int(aux[x])
         count+=R
+        #DEBUG----------------------------------------------
+        # if(i == 20): break
     return sinalCodificado.astype('int16')
 
 
@@ -84,15 +95,21 @@ def descodificaSinal(sinalCodificado, R):
     size = int(len(sinalCodificado)/R)
     print("tamanho do sinal codificado: " + str(len(sinalCodificado)))
     print("inteiro do tamanho do array: " + str(size))
+    print("\n")
     sinalDescodificado = np.zeros(size)
     count = 0
     binario = ''
     for i in range(0,len(sinalCodificado),R):
         for x in range(0,R):
             binario += str(sinalCodificado[i+x])
+        print("binario recebido: " + str(binario))
         sinalDescodificado[count]=int(binario,2)
+        print("numero em inteiro: " + str(sinalDescodificado[count]))
+        print("\n")
         binario=''
         count+=1
+        print("I: " + str(i))
+        if(i == 160):break
 
     return sinalDescodificado.astype('int16')
 
@@ -101,6 +118,9 @@ def quantificacaoInversa(sinalDescodificado,niveisQuantificacao):
     sinalQuantInv = np.zeros(len(sinalDescodificado))
     for i in range(len(sinalDescodificado)):
         sinalQuantInv[i]=niveisQuantificacao[sinalDescodificado[i]]
+        print("sinal quant inv: " + str(sinalQuantInv[i]))
+        #debug----------------------------------------
+        if(i==20):break
     return sinalQuantInv
 
 
@@ -261,6 +281,29 @@ def EX2C():
     fig.savefig(caminho + 'EX2C.png')
 
 if __name__=="__main__":
+    R =8
+    fsRecord, data = wav.read(caminho + 'sinaldevoz8khz.wav')
+    print("Frequencia maxima do sinal: " + str(np.amax(abs(data))) + "\n")
+    VD , NQ = createTable(R,np.amax(abs(data)))
+    print("Tabela valores de Decisao")
+    print(VD)
+    print("\n")
+    print("Tabela niveis de Quantificacao")
+    print(NQ)
+    print("\n")
+    print("Quantificacao do sinal")
+    sinalQ, indicesQ = quantificacao(data,NQ,VD)
+    print("\n")
+    print("Codificacao do sinal")
+    sinalCodificado = codificaSinal(indicesQ,R)
+    print("\n")
+    print("Descodificacao do sinal")
+    sinalDescodificado = descodificaSinal(sinalCodificado,R)
+    print("\n")
+    print("Quantificacao Inversa")
+    sinalDQ = quantificacaoInversa(sinalDescodificado,NQ)
+    print("\n")
+
     # EX3AQ()
     # EX3BQ()
     # EX3CQ()
