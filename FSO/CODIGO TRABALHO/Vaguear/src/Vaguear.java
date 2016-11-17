@@ -17,7 +17,9 @@ public class Vaguear implements ILogger {
 	
 	public Directions currentDirection;
 	
-	private MailBox mail;
+	private MailBox mailVaguear;
+	private MailBox mailGestor;
+	private String prefix = "PV ";
 	
 	protected String robotName;
 	
@@ -36,7 +38,8 @@ public class Vaguear implements ILogger {
   }
 	
 	public Vaguear(String name, int touchSensor, boolean simulateRobot) {
-		mail = new MailBox("gestor.dat");
+		mailVaguear = new MailBox("vaguear.dat");
+		mailGestor = new MailBox("gestor.dat");
 		this.robotName = name;
 		this.currentDirection = Directions.Stop;
 		
@@ -113,6 +116,22 @@ public class Vaguear implements ILogger {
 	  return this.theRobot.GetTouchSensor()==true;
 	}
 	
+	public void readMailBox(){
+		while(mailVaguear.read() != "exe"){
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		try {
+			doWork();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public void doWork() throws Exception {
 		boolean work;
 		work = true;
@@ -124,8 +143,7 @@ public class Vaguear implements ILogger {
 		for( ; work==true ; ) {
 			Directions newDirection;
 			
-			while ( (newDirection=getNextDirection())==this.currentDirection )
-				;
+			while ( (newDirection=getNextDirection())==this.currentDirection );
 			
 			this.currentDirection = newDirection;
 			
@@ -161,11 +179,14 @@ public class Vaguear implements ILogger {
 			if ( this.waitForDistanceAndTestSensor( (int)(sleepTime * 1000.0) )==true ) {
 			  this.theRobot.Parar( true );
 			  this.log( "Colision" );
-			  this.mail.write("bati");
+			  this.mailGestor.write(prefix + "bati");
 			  work = false;
+			  
 			}
 		}
 		
 		this.theRobot.CloseNXT();
+		readMailBox();
 	}
+	
 }
