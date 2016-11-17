@@ -1,5 +1,6 @@
 import java.util.Random;
 
+
 public class Vaguear implements ILogger {
 	public final int MinForward = 50;  // Centimeters
 	public final int RndForward = 40;  // Centimeters
@@ -15,6 +16,8 @@ public class Vaguear implements ILogger {
 	public enum Directions {Stop, Right, Left, Forward };
 	
 	public Directions currentDirection;
+	
+	private MailBox mail;
 	
 	protected String robotName;
 	
@@ -33,6 +36,7 @@ public class Vaguear implements ILogger {
   }
 	
 	public Vaguear(String name, int touchSensor, boolean simulateRobot) {
+		mail = new MailBox("gestor.dat");
 		this.robotName = name;
 		this.currentDirection = Directions.Stop;
 		
@@ -157,6 +161,7 @@ public class Vaguear implements ILogger {
 			if ( this.waitForDistanceAndTestSensor( (int)(sleepTime * 1000.0) )==true ) {
 			  this.theRobot.Parar( true );
 			  this.log( "Colision" );
+			  this.mail.write("bati");
 			  work = false;
 			}
 		}

@@ -133,7 +133,8 @@ public class MyRobot {
     }
     else {
       this.theLogger.log( "GetTouchSensord()" );
-      return this.rnd.nextInt(1000)>990;
+//      return this.rnd.nextInt(1000)>990;
+      return true;
     }
   }
 	
