@@ -10,8 +10,8 @@ public class AvoidObstacle implements ILogger {
 
 	protected MyRobot theRobot;
 	
-	private MailBox mailEvitar;
-	private MailBox mailGestor;
+	private MailBoxGestor mailEvitar;
+	private MailBoxGestor mailGestor;
 	private String prefix = "PA ";
 	
 
@@ -31,8 +31,8 @@ public class AvoidObstacle implements ILogger {
 		
 		//Cada classe lê o seu proprio mail mas escreve no mail do destinatário
 		
-		this.mailEvitar = new MailBox("evitar.dat");
-		this.mailGestor = new MailBox("gestor.dat");
+		this.mailEvitar = new MailBoxGestor("evitar.dat");
+		this.mailGestor = new MailBoxGestor("gestor.dat");
 		
 		
 		
