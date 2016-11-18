@@ -24,7 +24,7 @@ public class LaunchVaguear {
   		
   		Vaguear v;
   		v = new Vaguear( robotName, touchSensorPort, simulateRobot );
-  		v.doWork();
+  		v.readMailBox();
   		System.exit( 0 );
   		
 	  }

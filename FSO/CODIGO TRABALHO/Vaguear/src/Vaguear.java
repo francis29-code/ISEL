@@ -17,9 +17,10 @@ public class Vaguear implements ILogger {
 
 	public Directions currentDirection;
 
-	private MailBoxVaguear mailVaguear;
-	private MailBoxVaguear mailGestor;
-	private String prefix = "PV ";
+	private MailBox mailVaguear;
+	private MailBox mailGestor;
+	private String prefixGestor = "PG";
+	private String prefixVaguear = "PV";
 
 	protected String robotName;
 
@@ -38,9 +39,9 @@ public class Vaguear implements ILogger {
 	}
 
 	public Vaguear(String name, int touchSensor, boolean simulateRobot) {
-		mailVaguear = new MailBoxVaguear("vaguear.dat");
-		mailGestor = new MailBoxVaguear("gestor.dat");
-		
+		mailVaguear = new MailBox("vaguear.dat");
+		mailGestor = new MailBox("gestor.dat");
+		//mailGestor.write("lancei");
 		this.robotName = name;
 		this.currentDirection = Directions.Stop;
 
@@ -118,15 +119,26 @@ public class Vaguear implements ILogger {
 	}
 
 	public void readMailBox(){
-		while(!mailVaguear.read().contains("PG")){
+		while(!mailVaguear.read().startsWith(prefixGestor)){
 			try {
-				Thread.sleep(500);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 		try {
-			doWork();
+			this.log("verifica content:------------------- " + mailVaguear.read());
+			if(mailVaguear.read().contains("start")){
+				this.mailVaguear.eraseContent();
+				doWork();
+			}
+			else if(mailVaguear.read().contains("close")){
+				this.mailVaguear.eraseContent();
+				this.mailVaguear.closeChannel();
+				this.theRobot.Parar(true);
+				this.theRobot.CloseNXT();
+			}
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -180,7 +192,7 @@ public class Vaguear implements ILogger {
 			if ( this.waitForDistanceAndTestSensor( (int)(sleepTime * 1000.0) )==true ) {
 				this.theRobot.Parar( true );
 				this.log( "Colision" );
-				this.mailGestor.write(prefix + "bati");
+				this.mailGestor.write(prefixVaguear + "sstop");
 				work = false;
 
 			}
@@ -188,6 +200,12 @@ public class Vaguear implements ILogger {
 
 		this.theRobot.CloseNXT();
 		readMailBox();
+	}
+	
+	public static void main(String []args){
+		
+		new Vaguear("GUIA4", 2, true).readMailBox();
+		
 	}
 
 }

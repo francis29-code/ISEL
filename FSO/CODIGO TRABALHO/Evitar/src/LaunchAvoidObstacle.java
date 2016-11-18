@@ -1,4 +1,4 @@
-public class LaunchAvoidObstacle implements Runnable {
+public class LaunchAvoidObstacle{
 	
 	public static void main(String[] args) throws Exception {
 		
@@ -25,7 +25,7 @@ public class LaunchAvoidObstacle implements Runnable {
   		
   		AvoidObstacle ao;
   		ao = new AvoidObstacle( robotName, touchSensorPort, simulateRobot );
-  		ao.doAvoidObstacle();
+  		ao.readMailBox();
   		System.exit( 0 );
   		
 	  }
@@ -38,7 +38,4 @@ public class LaunchAvoidObstacle implements Runnable {
 	}
 	
 	
-	public void run(){
-		
-	}
 }

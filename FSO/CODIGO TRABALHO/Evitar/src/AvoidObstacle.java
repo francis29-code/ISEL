@@ -10,9 +10,10 @@ public class AvoidObstacle implements ILogger {
 
 	protected MyRobot theRobot;
 	
-	private MailBoxGestor mailEvitar;
-	private MailBoxGestor mailGestor;
-	private String prefix = "PA ";
+	private MailBox mailEvitar;
+	private MailBox mailGestor;
+	private String prefixAvoid = "PA ";
+	private String prefixGestor = "PG";
 	
 
 
@@ -31,8 +32,8 @@ public class AvoidObstacle implements ILogger {
 		
 		//Cada classe lê o seu proprio mail mas escreve no mail do destinatário
 		
-		this.mailEvitar = new MailBoxGestor("evitar.dat");
-		this.mailGestor = new MailBoxGestor("gestor.dat");
+		this.mailEvitar = new MailBox("evitar.dat");
+		this.mailGestor = new MailBox("gestor.dat");
 		
 		
 		
@@ -63,6 +64,7 @@ public class AvoidObstacle implements ILogger {
 				this.theRobot.CurvarEsquerda(MAX_RADIUS, MAX_ANGLE);
 				// this.log("Right(%3.2d, %3.2d)->%3.2d", MAX_RADIUS, MAX_ANGLE,
 				sleep = getSleepTime(MAX_RADIUS, MAX_ANGLE)+getSleepTime(MAX_DISTANCE);
+				
 				Thread.sleep((long)sleep);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -71,19 +73,37 @@ public class AvoidObstacle implements ILogger {
 			this.theRobot.Parar(true);
 		}
 		this.theRobot.CloseNXT();
-		this.mailGestor.write(prefix +"stop");
+		this.mailGestor.write(prefixAvoid +"sstop");
 		readMailBox();
 	}
 	
 	public void readMailBox(){
-		while(mailEvitar.read() != "exe"){
+		while(!mailEvitar.read().startsWith(prefixGestor)){
 			try {
-				Thread.sleep(500);
+				
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
-		doAvoidObstacle();
+		try {
+			if(mailEvitar.read().contains("start")){
+				//tem de consumir
+				this.mailEvitar.eraseContent();
+				doAvoidObstacle();
+			}
+			else if(mailEvitar.read().contains("close")){
+				this.mailEvitar.eraseContent();
+				mailEvitar.closeChannel();
+				this.theRobot.Parar(true);
+				this.theRobot.CloseNXT();
+			}
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	private double getCurveDistance(double angle, double radius) {
 		double perimeter = 2.0 * Math.PI * radius;
@@ -99,6 +119,11 @@ public class AvoidObstacle implements ILogger {
 	}
 	private double getSleepTime(double angle, double radius) { 
 		return getSleepTime ( getCurveDistance(angle, radius) );
+	}
+	
+	public static void main(String []args){
+		new AvoidObstacle("GUIA4", 2, true).readMailBox();
+		
 	}
 	
 	

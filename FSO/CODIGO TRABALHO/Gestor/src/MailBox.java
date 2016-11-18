@@ -4,7 +4,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
 public class MailBox {
-	final static String path = "C:\\Users\\Denga\\Desktop\\workspace\\Vaguear\\comunications\\";
+	final static String path = "C:\\Users\\Denga\\Desktop\\workspace\\comunications\\";
 	private File file;
 	private FileChannel filechannel;
 	private MappedByteBuffer map;
@@ -12,9 +12,11 @@ public class MailBox {
 
 	public MailBox(String nome) {
 		// buffer stream
-		this.file = new File(path+nome);
+		
 
 		try {
+			this.file = new File(path+nome);
+			this.file.createNewFile();
 			filechannel = new RandomAccessFile(this.file, "rw").getChannel();
 
 		} catch (Exception e) {
@@ -39,6 +41,10 @@ public class MailBox {
 		}
 
 		return str;
+	}
+	
+	public void eraseContent() {
+		write("xxxxxxx");
 	}
 
 	public void write(String msg) {
