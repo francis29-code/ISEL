@@ -38,36 +38,51 @@ def erroQuantificacao(sinalOriginal, sinalQuantificado):
 
 #grava um sinal
 def recordSignal(name, freq, signal):
-    wav.write(caminho+name,freq,signal.astype('int16'))
+    wav.write(caminho+name,freq,signal.astype('int32'))
 
 #retorna dois numpy arrays com os valores de
 #decisão e com os niveis de quantificação
 def createTable(R, Vmax):
-    valoresDecisao = np.arange(-Vmax , Vmax+((2.*Vmax)/(2.**R)) , (2.*Vmax)/(2.**R))
-    niveisQuantificacao = np.arange(-Vmax+(Vmax/(2.**R)) , Vmax , (2.*Vmax)/(2.**R))
+    L = 2**R                                 # L- nª intervalos de quantificação
+    deltaQ = 2.*Vmax/L
+    valoresDecisao = np.arange(-Vmax, Vmax+deltaQ, deltaQ)
+    niveisQuantificacao = np.arange(-Vmax+deltaQ/2, Vmax, deltaQ)
     return valoresDecisao, niveisQuantificacao
 
 #retorna dois numpy arrays com o sinal quantificado
 #e outro com os indices dos niveis de quantificação usados
 def quantificacao(sinalAmostrado, NQ, VD):
+    # sinalQuantificado = np.zeros(len(sinalAmostrado))
+    # indiceQuant = np.zeros(len(sinalAmostrado))
+    # maximo = np.amax(abs(sinalAmostrado))
+    # for a in range(len(sinalAmostrado)):
+    #     print("Amostra do sinal n_" + str(a) +": " + str(sinalAmostrado[a]))
+    #     indice =  VD > sinalAmostrado[a]
+    #     if(sinalAmostrado[a]==maximo):
+    #         indiceQuant[a] = len(NQ)-1
+    #         sinalQuantificado[a] = NQ[len(NQ)-1]
+    #     else:
+    #         indiceTrue = np.nonzero(indice)
+    #         aux = int(indiceTrue[0][0]-1)
+    #         indiceQuant[a] = aux
+    #         sinalQuantificado[a] = NQ[aux]
+    #         print("Valor de quantificacao n_" +str(a)+ ": " + str(NQ[aux]))
+    #         print("Indice de quantificacao: n_" +str(a)+ ": " + str(aux))
+    #         print("\n")
+    #     if(a == 20): break
     sinalQuantificado = np.zeros(len(sinalAmostrado))
     indiceQuant = np.zeros(len(sinalAmostrado))
-    maximo = np.amax(abs(sinalAmostrado))
-    for a in range(len(sinalAmostrado)):
-        print("Amostra do sinal n_" + str(a) +": " + str(sinalAmostrado[a]))
-        indice =  VD > sinalAmostrado[a]
-        if(sinalAmostrado[a]==maximo):
-            indiceQuant[a] = len(NQ)-1
-            sinalQuantificado[a] = NQ[len(NQ)-1]
-        else:
-            indiceTrue = np.nonzero(indice)
-            aux = int(indiceTrue[0][0]-1)
-            indiceQuant[a] = aux
-            sinalQuantificado[a] = NQ[aux]
-            print("Valor de quantificacao n_" +str(a)+ ": " + str(NQ[aux]))
-            print("Indice de quantificacao: n_" +str(a)+ ": " + str(aux))
-            print("\n")
-        if(a == 20): break
+
+    for i in range(len(sinalAmostrado)):
+        print("Amostra do sinal n_" + str(i) +": " + str(sinalAmostrado[i]))
+        numero_de_valores = VD >= sinalAmostrado[i]
+
+        resultado = np.nonzero(numero_de_valores)
+        xq2 = resultado[0][0]-1
+        sinalQuantificado[i] = NQ[xq2]
+        indiceQuant[i] = xq2
+        print("Valor de quantificacao n_" +str(i)+ ": " + str(NQ[xq2]))
+        print("Indice de quantificacao: n_" +str(i)+ ": " + str(xq2))
 
     return sinalQuantificado , indiceQuant.astype('int16')
 
@@ -79,15 +94,15 @@ def codificaSinal(IQ, R):
     count=0
     binario = '{0:0'+str(R)+'b}'
     for i in range(len(IQ)):
-        # print("valor do indice de quantificacao: " +str(IQ[i]))
+        print("valor do indice de quantificacao: " +str(IQ[i]))
         aux = binario.format(IQ[i])
-        # print("valor de indice em binario: " + str(aux))
-        # print("\n")
+        print("valor de indice em binario: " + str(aux))
+        print("\n")
         for x in range(0,R):
             sinalCodificado[count+x]=int(aux[x])
         count+=R
         #DEBUG----------------------------------------------
-        # if(i == 20): break
+        if(i == 20): break
     return sinalCodificado.astype('int16')
 
 
@@ -109,7 +124,7 @@ def descodificaSinal(sinalCodificado, R):
         binario=''
         count+=1
         print("I: " + str(i))
-        if(i == 160):break
+        if(i == 60):break
 
     return sinalDescodificado.astype('int16')
 
@@ -281,8 +296,8 @@ def EX2C():
     fig.savefig(caminho + 'EX2C.png')
 
 if __name__=="__main__":
-    R =8
-    fsRecord, data = wav.read(caminho + 'sinaldevoz8khz.wav')
+    R =3
+    fsRecord, data = wav.read(caminho + 'mulher.wav')
     print("Frequencia maxima do sinal: " + str(np.amax(abs(data))) + "\n")
     VD , NQ = createTable(R,np.amax(abs(data)))
     print("Tabela valores de Decisao")
@@ -294,15 +309,30 @@ if __name__=="__main__":
     print("Quantificacao do sinal")
     sinalQ, indicesQ = quantificacao(data,NQ,VD)
     print("\n")
-    print("Codificacao do sinal")
-    sinalCodificado = codificaSinal(indicesQ,R)
-    print("\n")
-    print("Descodificacao do sinal")
-    sinalDescodificado = descodificaSinal(sinalCodificado,R)
-    print("\n")
-    print("Quantificacao Inversa")
-    sinalDQ = quantificacaoInversa(sinalDescodificado,NQ)
-    print("\n")
+    # print("Codificacao do sinal")
+    # sinalCodificado = codificaSinal(indicesQ,R)
+    # print("\n")
+    # print("Descodificacao do sinal")
+    # sinalDescodificado = descodificaSinal(sinalCodificado,R)
+    # print("\n")
+    # print("Quantificacao Inversa")
+    # sinalDQ = quantificacaoInversa(sinalDescodificado,NQ)
+    # print("\n")
+    #
+    # wav.write(caminho+"women.wav",fsRecord,sinalQ.astype('int16'))
+    #grava sinal de voz quantificado
+    # recordSignal("novosinal8khz.wav", fsRecord, sinalDQ)
+
+    ##leitura do sinal
+    # newFS, signal = wav.read(caminho+'novosinal8khz.wav')
+
+    ##debug sinal
+    # for i in range(len(signal)):
+    #     print("amostra do sinal n_" + str(i)+ ": " + str(signal[i]))
+    #     if(i==20): break
+
+
+
 
     # EX3AQ()
     # EX3BQ()
