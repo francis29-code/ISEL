@@ -309,7 +309,7 @@ if __name__=="__main__":
     #leitura do sinal
     #newFS, signal = wav.read(caminho+'novosinal8khz.wav')
 
-    wav.write(caminho+"novoSinaldevozwlelelelel.wav",fsRecord,sinalDQ.astype('int16'))
+    recordSignal(caminho+"novoSinaldevozwlelelelel.wav",fsRecord,sinalDQ.astype('int16'))
 
     # EX3AQ()
     # EX3BQ()
