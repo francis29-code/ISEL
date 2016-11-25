@@ -14,26 +14,28 @@ caminho = str(sys.path[0])+"\\"
 #calcula a potencia do sinal amostrado
 def potenciaSinal(sinalAmostrado):
     potencia = (1./len(sinalAmostrado))*np.sum(sinalAmostrado**2.)
+    # potencia = (np.sum(1.*np.power(sinalAmostrado,2.0))/(len(sinalAmostrado)))
     return potencia
 
 #calcula a potencia do sinal de erro de quantificação
 def potenciaErroQuant(erroQuantificado):
     potenciaErro = (1./len(erroQuantificado))*np.sum(erroQuantificado**2.)
+    # potenciaErro = (np.sum((1.*np.power(erroQuantificado,2.0))/(len(erroQuantificado))))
     return potenciaErro
 
 #calcula o SNR teorico
 def SNRTeorico(potencia,R,Vmax):
-    valor = 6.*R + 10.*np.log((3.*potencia)/Vmax**2.)
+    valor = 6.02*R + 10.*np.log10((3.*potencia)/(np.power(Vmax,2.)))
     return valor
 
 #calcula o SNR pratico
 def SNRPratico(potenciaSinal, potenciaErro):
-    valor = 10.*np.log(potenciaSinal/potenciaErro)
+    valor = 10*np.log10(potenciaSinal/potenciaErro)
     return valor
 
 #retorna um numpy array com o erro do sinal
 def erroQuantificacao(sinalOriginal, sinalQuantificado):
-    erroSinal = sinalOriginal - sinalQuantificado
+    erroSinal = sinalQuantificado - sinalOriginal
     return erroSinal
 
 #grava um sinal
@@ -52,9 +54,20 @@ def createTable(R, Vmax):
 #retorna dois numpy arrays com o sinal quantificado
 #e outro com os indices dos niveis de quantificação usados
 def quantificacao(sinalAmostrado, NQ, VD):
+    #  xq = np.zeros(len(sinalAmostrado))
+    #  indices = np.zeros(len(sinalAmostrado))
+     #
+    #  for i in range(len(sinalAmostrado)):
+    #      numero_de_valores = VD >= sinalAmostrado[i]
+     #
+    #      resultado = np.nonzero(numero_de_valores)
+    #      xq2 = resultado[0][0]-1
+    #      xq[i] = NQ[xq2]
+    #      indices[i] = xq2
+    #  return xq,indices.astype('int16')
      sinalQuantificado = np.zeros(len(sinalAmostrado))
      indiceQuant = np.zeros(len(sinalAmostrado))
-     maximo = np.amax(abs(sinalAmostrado))
+     maximo = np.max(np.abs(sinalAmostrado))
      for a in range(len(sinalAmostrado)):
          indice =  VD > sinalAmostrado[a]
          if(sinalAmostrado[a]==maximo):
@@ -109,7 +122,7 @@ def quantificacaoInversa(sinalDescodificado,niveisQuantificacao):
 def EX3AQ():
     R = 3
     SR=np.arange(-1,1,0.0001)
-    VD,NQ = createTable(R,np.amax(abs(SR)))
+    VD,NQ = createTable(R,np.max(np.abs(SR)))
     SQ,IQU = quantificacao(SR , NQ, VD)
     Tsq=np.arange(0,len(SQ))
     figure = plt.figure()
@@ -125,7 +138,7 @@ def EX3AQ():
 def EX3BQ():
     R = 3
     SR=np.arange(-1,1,0.0001)
-    VD,NQ = createTable(R,np.amax(abs(SR)))
+    VD,NQ = createTable(R,np.max(np.abs(SR)))
     SQ,IQU = quantificacao(SR , NQ, VD)
     erro = erroQuantificacao(SR,SQ)
     figure = plt.figure()
@@ -148,14 +161,14 @@ def EX3CQ():
     arraySNRpratico = np.zeros(len(R))
     arraySNRteorico = np.zeros(len(R))
     for i in range(len(R)):
-        VD,NQ = createTable(R[i],np.amax(abs(SR)))
+        VD,NQ = createTable(R[i],np.max(np.abs(SR)))
         SQ,IQU = quantificacao(SR , NQ, VD)
         erro = erroQuantificacao(SR,SQ)
         potenciaErro = potenciaErroQuant(erro)
         potencia = potenciaSinal(SR)
         auxSNRP = SNRPratico(potencia,potenciaErro)
         arraySNRpratico[i] = auxSNRP
-        auxSNRT = SNRTeorico(potencia,R[i],np.amax(abs(SR)))
+        auxSNRT = SNRTeorico(potencia,R[i],np.max(np.abs(SR)))
         arraySNRteorico[i] = auxSNRT
 
     B = np.vstack((arraySNRteorico,arraySNRpratico))
@@ -180,7 +193,7 @@ def EX4AQ():
 
 def EX4BQ():
     fsRecord, data = wav.read(caminho + 'sinaldevoz8khz.wav')
-    VD,NQ = createTable(8,np.amax(abs(data)))
+    VD,NQ = createTable(8,np.max(np.abs(data)))
     SQ,IQU = quantificacao(data , NQ, VD)
     SQanterior = np.zeros(len(SQ))
     figure = plt.figure()
@@ -199,14 +212,14 @@ def EX4CQ():
     arraySNRpratico = np.zeros(len(R))
     arraySNRteorico = np.zeros(len(R))
     for i in range(len(R)):
-        VD,NQ = createTable(R[i],np.amax(abs(data)))
+        VD,NQ = createTable(R[i],np.max(np.abs(data)))
         SQ,IQU = quantificacao(data , NQ, VD)
         erro = erroQuantificacao(data,SQ)
         potenciaErro = potenciaErroQuant(erro)
         potencia = potenciaSinal(data)
         auxSNRP = SNRPratico(potencia,potenciaErro)
         arraySNRpratico[i] = auxSNRP
-        auxSNRT = SNRTeorico(potencia,R[i],np.amax(abs(data)))
+        auxSNRT = SNRTeorico(potencia,R[i],np.max(np.abs(data)))
         arraySNRteorico[i] = auxSNRT
 
     B = np.vstack((arraySNRteorico,arraySNRpratico))
@@ -216,8 +229,8 @@ def EX4CQ():
     rowlabel=("SNRTeorico","SNRPratico")
     axs[0].axis('off')
     the_table = axs[0].table(cellText=clust_data,colLabels=collabel,rowLabels=rowlabel,loc='center')
-    axs[1].plot(R,arraySNRteorico,'o',label='SNRteorico')
-    axs[1].plot(R,arraySNRpratico,'o',label='SNRpratico')
+    axs[1].plot(R,arraySNRteorico,label='SNRteorico')
+    axs[1].plot(R,arraySNRpratico,label='SNRpratico')
     axs[1].legend(loc='upper left')
     plt.show()
 
@@ -247,6 +260,8 @@ def EX2C():
         #quantificaçao inversa do sinal
         sinalDesquantificado = quantificacaoInversa(sinalDescodificado,NQ)
         #gravacao do sinal
+        print(data)
+        print(sinalDesquantificado)
         recordSignal("Sinal novo R="+str(R[i])+".wav",fsRecord,sinalDesquantificado.astype('int16'))
 
     B = np.vstack((arraySNRteorico,arraySNRpratico))

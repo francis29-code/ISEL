@@ -5,6 +5,17 @@ import scipy.io.wavfile as wav
 import sys
 import pylab as pylab
 import time
+from TP2e3 import createTable
+from TP2e3 import quantificacao
+from TP2e3 import codificaSinal
+from TP2e3 import SNRTeorico
+from TP2e3 import SNRPratico
+from TP2e3 import potenciaErroQuant
+from TP2e3 import erroQuantificacao
+from TP2e3 import potenciaSinal
+from TP2e3 import descodificaSinal
+from TP2e3 import quantificacaoInversa
+from TP2e3 import recordSignal
 
 start_time = time.time()
 
@@ -62,7 +73,7 @@ def hamming(message):
 
 def sindrome(message):
     #possiveis sindromas
-    sindromeTable = np.array([[0,0,0],[0,1,1],[1,1,0],[1,0,1],[1,1,1],[1,0,0],[0,1,0],[0,0,1]])
+    sindromeTable = np.array([[0,1,1],[1,1,0],[1,0,1],[1,1,1],[1,0,0],[0,1,0],[0,0,1]])
     #percorre o sinal
     for i in range(0, len(message), totalBits):
         currentMessage = message[i:i+totalBits]
@@ -74,8 +85,8 @@ def sindrome(message):
         count = 0
         errors = 0
         for x in range(0,len(sindromeTable)):
-            if(sum(P[x]==sindromeResult)==controlBits):
-                mensagem[i+count] = (mensagem[i+count]+1)%2
+            if(sum(sindromeTable[x]==sindromeResult)==controlBits):
+                message[i+count] = (message[i+count]+1)%2
                 #apenas corrige um erro
                 break
             else:
@@ -83,73 +94,57 @@ def sindrome(message):
         if(sum(sindromeResult)!=0):
             errors += 1
         count =0
-        correctedMessage[count:count+messageBits] = message[i:i+messageBits]
+        correctedMessage[index:index+messageBits] = message[i:i+messageBits]
         index += messageBits
 
     return errors, correctedMessage.astype('int16')
 
-def simulation(message):
+def simulation():
 
-    BER = 0.1
-    #erro aplica-se à mensagem codificada
+    fsRecord, data = wav.read(caminho+"sinaldevoz8khz.wav")
+    R = 8
+    BERt = 0.1
 
-    VQ,VD = CriarTabela(R,A)
-    SQ, VaQ = SinalQuantificado(y,VQ,VD)
-    SinalCodificado = IntparaBin(VaQ,R)
+    VD,NQ = createTable(R,np.max(np.abs(data)))
+    SQ, IQ = quantificacao(data,NQ,VD)
+    signalCodif = codificaSinal(IQ,R)
+    signalControl = hamming(signalCodif)
 
-    H = Hamming(SinalCodificado)
+    print( "CODIGO HAMMING RETURN : " + str(signalControl))
+    print("\n")
+    whiteNoise = 1*np.logical_xor(signalControl, np.random.binomial(1,BERt, len(signalControl)))
 
-    print "CODIGO HAMMING RETURN : " + str(H)
+    print("white noise signal: " + str(whiteNoise))
+    print("\n")
+    errors, corrected = sindrome(whiteNoise)
 
-    SinalComRuido = 1*np.logical_xor(H, np.random.binomial(1,0.1, len(H)))
+    BerScorrecao = sum((signalControl + whiteNoise)%2.)/float(len(signalControl))
+    print ("BER sem correcao")
+    print (str(BerScorrecao))
+    print("\n")
 
-    corrigido = Sindroma(SinalComRuido)
+    berCcorrecao = float(errors)/float(len(signalCodif))
+    print ("BER com correcao")
+    print (str(berCcorrecao))
 
-    BerScorrecao = sum((H + SinalComRuido)%2.)/float(len(H))
-    print "BER sem correcao"
-    print BerScorrecao
+    print(corrected)
 
-    err=0.
-    for i in range(len(SinalCodificado)):
-        if(SinalCodificado[i] != corrigido[i]):
-            err=err+1
+    decodedSignal = descodificaSinal(corrected,R)
 
-    ber = float(err)/float(len(SinalCodificado))
-    print "BER com correcao"
-    print ber
+    signalQuant = quantificacaoInversa(decodedSignal,NQ)
 
-    ##calculo do ber vê-se com
-    y = 1*np.logical_xor(x,np.binomial(1,BER,len(message)))
+    print(signalQuant)
+    print(data)
 
+    recordSignal("novoSinal.wav",fsRecord,signalQuant)
 
 
 
 if __name__ == "__main__":
-    # sindrome()
-    a = np.array([1,2,3])
-    b = np.array([3,2,1])
-    c = a+b
-    print(c)
-    # sindromeTable = np.array([[0,1,1],[1,1,0],[1,0,1],[1,1,1],[1,0,0],[0,1,0],[0,0,1]])
-    # x = np.array([1,1,1,3,3,4,5,6,7,8,8,7,6,5,5,45,5,3,3,3,3])
-    # print(str(len(x)))
-    # size = (len(x)/7)*4
-    # print(str(int(size)))
-    # for i in range(len(sindromeTable)):
-    #     print(str(sindromeTable[i]))
-    #     if(sum(sindromeTable[i] == x) == 3):
-    #         print(True)
-    #         break
-    # y = np.array([0,1,1,1])
-    # print(sum(y))
-    # x = hamming(y)
-    # sindromeResult = np.mod(np.dot(x,sindromeTable),2)
-    # print(x)
-    # print(sindromeResult)
+    # mensagem = np.array([1,0,0,0,0])
+    #
+    # mensagemControl = hamming(mensagem)
+    #
+    # print(mensagemControl)
 
-    # print(sindromeTable[1])
-    # print(sindromeTable[4]==y)
-    # print(str(sum(sindromeTable[4]==y)))
-
-
-    # hamming(teste)
+    simulation()
