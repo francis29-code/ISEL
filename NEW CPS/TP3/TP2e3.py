@@ -25,7 +25,7 @@ def potenciaErroQuant(erroQuantificado):
 
 #calcula o SNR teorico
 def SNRTeorico(potencia,R,Vmax):
-    valor = 6.02*R + 10.*np.log10((3.*potencia)/(np.power(Vmax,2.)))
+    valor = 6.02*R + 10.*np.log10((3.*potencia)/(Vmax**2))
     return valor
 
 #calcula o SNR pratico
@@ -284,8 +284,8 @@ if __name__=="__main__":
     # EX3CQ()
     # EX4AQ()
     # EX4BQ()
-    # EX4CQ()
-    EX2C()
+    EX4CQ()
+    # EX2C()
 
 
 print("--- %s seconds ---" % (time.time() - start_time))

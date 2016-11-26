@@ -22,12 +22,9 @@ start_time = time.time()
 caminho = str(sys.path[0])+"\\"
 #exercicio um codigo de hamming
 # c = m x G
-
 #matriz geradora dos bits de paridade - G
 #mensagem extraida da Codificacao - M
-
 # sendo C os bits de controlo de erros a adicionar à mensagem
-
 #numero bits de informacao
 messageBits = 4
 #numero bits totais
@@ -38,7 +35,7 @@ controlBits = totalBits-messageBits
 P = np.array([[0,1,1],[1,1,0],[1,0,1],[1,1,1]])
 
 #mensagem de teste
-teste = np.array([1,0,1,0,1])
+teste = np.array([1,0,1,0,1,1,1,1])
 
 def hamming(message):
     #tornar mensagem global na funcao
@@ -75,15 +72,16 @@ def sindrome(message):
     #possiveis sindromas
     sindromeTable = np.array([[0,1,1],[1,1,0],[1,0,1],[1,1,1],[1,0,0],[0,1,0],[0,0,1]])
     #percorre o sinal
+    errors = 0
+    index = 0
+    count = 0
     for i in range(0, len(message), totalBits):
         currentMessage = message[i:i+totalBits]
         #resultado do sindroma multiplicado por matriz de teste de paridade
         sindromeResult = np.mod(np.dot(currentMessage,sindromeTable),2)
         size = (len(message)/totalBits)*messageBits
         correctedMessage = np.zeros(int(size))
-        index = 0
-        count = 0
-        errors = 0
+
         for x in range(0,len(sindromeTable)):
             if(sum(sindromeTable[x]==sindromeResult)==controlBits):
                 message[i+count] = (message[i+count]+1)%2
@@ -118,14 +116,23 @@ def simulation():
     print("\n")
     errors, corrected = sindrome(whiteNoise)
 
-    BerScorrecao = sum((signalControl + whiteNoise)%2.)/float(len(signalControl))
+    BerScorrecao = sum(np.logical_xor(signalControl,whiteNoise))/float(len(signalControl))
     print ("BER sem correcao")
     print (str(BerScorrecao))
     print("\n")
 
-    berCcorrecao = float(errors)/float(len(signalCodif))
+    print("\n")
+    erro=0
+    print("tamanho codif " + (str(len(signalCodif))))
+    print("tamanho corrected " + (str(len(corrected))))
+    for i in range(len(signalCodif)):
+        if(signalCodif[i] != corrected[i]):
+            erro = erro +1
+
+    berCcorrecao = float(erro)/float(len(signalCodif))
     print ("BER com correcao")
     print (str(berCcorrecao))
+    print("\n")
 
     print(corrected)
 
@@ -136,15 +143,25 @@ def simulation():
     print(signalQuant)
     print(data)
 
-    recordSignal("novoSinal.wav",fsRecord,signalQuant)
+    recordSignal("novoSinal.wav",fsRecord,signalQuant.astype('int16'))
+
+    print("SNRpratica")
+    erro = erroQuantificacao(data,SQ)
+    potenciaErro = potenciaErroQuant(erro)
+    potencia = potenciaSinal(data)
+    auxSNRP = SNRPratico(potencia,potenciaErro)
+    print(auxSNRP)
+    print("\n")
 
 
 
 if __name__ == "__main__":
-    # mensagem = np.array([1,0,0,0,0])
-    #
-    # mensagemControl = hamming(mensagem)
-    #
-    # print(mensagemControl)
-
-    simulation()
+    mensagem = hamming(teste)
+    print("mensagem do hamming ")
+    print(mensagem)
+    print("\n")
+    corrigida = sindrome(mensagem)
+    print("mensagem corrigida")
+    print(corrigida)
+    print("\n")
+    # simulation()
