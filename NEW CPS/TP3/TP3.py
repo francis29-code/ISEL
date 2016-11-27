@@ -38,6 +38,8 @@ P = np.array([[0,1,1],[1,1,0],[1,0,1],[1,1,1]])
 teste = np.array([1,0,1,0,1,1,1,1])
 
 def hamming(message):
+    # print("tamanho inicial mensagem: " + str(len(message)))
+    # print("\n")
     #tornar mensagem global na funcao
     currentMessage = message
     #verificacao do tamanho da mensagem
@@ -50,6 +52,9 @@ def hamming(message):
         for i in range(len(message)):
             currentMessage[i] = message[i]
 
+
+    # print("tamanho inicial mensagem corrigido: " + str(len(currentMessage)))
+    # print("\n")
     #matriz identidade
     identity = np.eye(messageBits)
     #matriz geradora
@@ -66,6 +71,8 @@ def hamming(message):
             finalBits[count] = addControl[x]
             count += 1
 
+    # print("tamanho final bits : " + str(len(finalBits)))
+    # print("\n")
     return finalBits.astype('int16')
 
 def sindrome(message):
@@ -75,17 +82,34 @@ def sindrome(message):
     errors = 0
     index = 0
     count = 0
+    correctedbits = 0
+    size = ((len(message)/totalBits)*messageBits)
+    correctedMessage = np.zeros(int(size))
+    # print("tamanho da mensagme corrigida: " + str(len(correctedMessage)))
+    # print("\n")
     for i in range(0, len(message), totalBits):
         currentMessage = message[i:i+totalBits]
-        #resultado do sindroma multiplicado por matriz de teste de paridade
+        # print("mensagem corrente - sindroma : " + str(currentMessage))
+        # resultado do sindroma multiplicado por matriz de teste de paridade
         sindromeResult = np.mod(np.dot(currentMessage,sindromeTable),2)
-        size = (len(message)/totalBits)*messageBits
-        correctedMessage = np.zeros(int(size))
-
+        # print("resultado do sindroma: " + str(sindromeResult))
+        # print("\n")
         for x in range(0,len(sindromeTable)):
             if(sum(sindromeTable[x]==sindromeResult)==controlBits):
                 message[i+count] = (message[i+count]+1)%2
                 #apenas corrige um erro
+                correctedbits += 1
+
+                #
+                # print("indice da tabala: " + str(x))
+                # print("sindromeTable message: " + str(sindromeTable[x]))
+                # print("numero do count: " + str(count))
+                # print("\n")
+                #
+                # print("entrou")
+                # print("mensagem corrigida - sindroma : " + str(message[i:i+totalBits]))
+                # print("\n")
+
                 break
             else:
                 count+=1
@@ -95,73 +119,67 @@ def sindrome(message):
         correctedMessage[index:index+messageBits] = message[i:i+messageBits]
         index += messageBits
 
-    return errors, correctedMessage.astype('int16')
+    return correctedbits, correctedMessage.astype('int16')
 
 def simulation():
 
     fsRecord, data = wav.read(caminho+"sinaldevoz8khz.wav")
     R = 8
     BERt = 0.1
-
+    #criacao das tabelas
     VD,NQ = createTable(R,np.max(np.abs(data)))
+    #quantificacao do sinal lido
     SQ, IQ = quantificacao(data,NQ,VD)
+    #codificacao do sinal quantificado
     signalCodif = codificaSinal(IQ,R)
+    #adicao dos bits de erro
     signalControl = hamming(signalCodif)
-
-    print( "CODIGO HAMMING RETURN : " + str(signalControl))
-    print("\n")
-    whiteNoise = 1*np.logical_xor(signalControl, np.random.binomial(1,BERt, len(signalControl)))
-
-    print("white noise signal: " + str(whiteNoise))
-    print("\n")
-    errors, corrected = sindrome(whiteNoise)
-
-    BerScorrecao = sum(np.logical_xor(signalControl,whiteNoise))/float(len(signalControl))
+    #aplicacao de ruido
+    noise = 1*np.logical_xor(signalControl, np.random.binomial(1,BERt, len(signalControl)))
+    #correcao do sinal
+    correctedB, corrected = sindrome(noise)
+    #medicao do BER sem correcao
+    BerScorrecao = sum(np.logical_xor(signalControl,noise))/float(len(signalControl))
     print ("BER sem correcao")
     print (str(BerScorrecao))
     print("\n")
 
-    print("\n")
+    #medicao do BER apos correcao
+    #comparando o array inicialmente codificado com o resultante
+    #da correcao
     erro=0
-    print("tamanho codif " + (str(len(signalCodif))))
-    print("tamanho corrected " + (str(len(corrected))))
     for i in range(len(signalCodif)):
         if(signalCodif[i] != corrected[i]):
             erro = erro +1
+
 
     berCcorrecao = float(erro)/float(len(signalCodif))
     print ("BER com correcao")
     print (str(berCcorrecao))
     print("\n")
-
-    print(corrected)
-
+    #descodificacao do sinal
     decodedSignal = descodificaSinal(corrected,R)
-
+    #desquantificacao do sinal
     signalQuant = quantificacaoInversa(decodedSignal,NQ)
 
-    print(signalQuant)
-    print(data)
-
-    recordSignal("novoSinal.wav",fsRecord,signalQuant.astype('int16'))
-
-    print("SNRpratica")
-    erro = erroQuantificacao(data,SQ)
+    ## medicao da SNRPratica
+    erro = erroQuantificacao(data,signalQuant)
     potenciaErro = potenciaErroQuant(erro)
     potencia = potenciaSinal(data)
-    auxSNRP = SNRPratico(potencia,potenciaErro)
-    print(auxSNRP)
+    SNRP = SNRPratico(potencia,potenciaErro)
+
+    print("SNR Pratica do sinal")
+    print(SNRP)
     print("\n")
+
+    #gravacao do sinal apos todo o processo
+    recordSignal("sinalteste8kR8.wav",fsRecord,signalQuant.astype('int16'))
 
 
 
 if __name__ == "__main__":
-    mensagem = hamming(teste)
-    print("mensagem do hamming ")
-    print(mensagem)
-    print("\n")
-    corrigida = sindrome(mensagem)
-    print("mensagem corrigida")
-    print(corrigida)
-    print("\n")
-    # simulation()
+
+    simulation()
+
+
+print("--- %s seconds ---" % (time.time() - start_time))
