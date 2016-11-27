@@ -4,16 +4,14 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
 public class MailBox {
-	final static String path = "C:\\Users\\Denga\\Desktop\\workspace\\comunications\\";
+	final static String path = "C:\\Users\\Denga\\Desktop\\comunica\\";
 	private File file;
 	private FileChannel filechannel;
 	private MappedByteBuffer map;
 	final static int MAX_BUFFER = 30;
 
 	public MailBox(String nome) {
-		// buffer stream
-		
-
+	
 		try {
 			this.file = new File(path+nome);
 			this.file.createNewFile();
@@ -66,5 +64,12 @@ public class MailBox {
 			e.printStackTrace();
 		}
 	}
+	
+//	public static void main(String [] args){
+//		MailBox evitar;
+//		evitar = new MailBox("evitar.dat");
+//		evitar.write("cenas");
+//		
+//	}
 
 }

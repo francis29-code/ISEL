@@ -12,7 +12,7 @@ public class AvoidObstacle implements ILogger {
 	
 	private MailBox mailEvitar;
 	private MailBox mailGestor;
-	private String prefixAvoid = "PA ";
+	private String prefixAvoid = "PA";
 	private String prefixGestor = "PG";
 	
 
@@ -56,16 +56,17 @@ public class AvoidObstacle implements ILogger {
 	}
 
 	public void doAvoidObstacle() {
-		double sleep = 0.;
+//		double sleep = 0.;
 		while(readSensor()) {
 			try {
 				this.theRobot.Reta(-MAX_DISTANCE);
 				// this.log("backwards(%3.2d)", MAX_DISTANCE);
 				this.theRobot.CurvarEsquerda(MAX_RADIUS, MAX_ANGLE);
 				// this.log("Right(%3.2d, %3.2d)->%3.2d", MAX_RADIUS, MAX_ANGLE,
-				sleep = getSleepTime(MAX_RADIUS, MAX_ANGLE)+getSleepTime(MAX_DISTANCE);
+//				sleep = getSleepTime(MAX_RADIUS, MAX_ANGLE)+getSleepTime(MAX_DISTANCE);
 				
-				Thread.sleep((long)sleep);
+				Thread.sleep(600);
+//				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -81,7 +82,7 @@ public class AvoidObstacle implements ILogger {
 		while(!mailEvitar.read().startsWith(prefixGestor)){
 			try {
 				
-				Thread.sleep(1000);
+				Thread.sleep(600);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -122,7 +123,16 @@ public class AvoidObstacle implements ILogger {
 	}
 	
 	public static void main(String []args){
-		new AvoidObstacle("GUIA4", 2, true).readMailBox();
+		String nome;
+		int port;
+		boolean simulate;
+		
+		nome = args[0];
+		port = Integer.parseInt(args[1]);
+		simulate = Boolean.parseBoolean(args[2]);
+		AvoidObstacle ao;
+		ao = new AvoidObstacle(nome, port, simulate);
+		ao.readMailBox();
 		
 	}
 	

@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Gestor {
 
@@ -6,14 +8,14 @@ public class Gestor {
 	final int SLEEP_TIME = 1000;
 	// caixas de correio para cada processo
 	private MailBox mailGestor, mailVaguear, mailEvitar;
-	private String jarAvoid = "java -jar C:\\Users\\Denga\\Desktop\\JAR FILES\\avoid.jar";
-	private String jarVaguear = "java -jar C:\\Users\\Denga\\Desktop\\JAR FILES\\vaguear.jar";
+	private String jarAvoid = "C:\\Users\\Denga\\Desktop\\JARFILES\\evitar.jar";
+	private String jarVaguear = "C:\\Users\\Denga\\Desktop\\JARFILES\\vaguear.jar";
 	private Process processVaguear, processAvoid;
-	private Runtime runtime;
+	private String[] arguments = new String[]{"java","-jar","GUIA4",""+RobotLego.S_2,"true"};
 	private String prefixGestor = "PG";
 	private String prefixAvoid = "PA";
 	private String prefixVaguear = "PV";
-	int estado;
+	private int estado;
 	static private final int init = 0;
 	static private final int vaguear = 1;
 	static private final int avoid = 2;
@@ -22,11 +24,9 @@ public class Gestor {
 	static private final int Terminar = 5;
 
 	public Gestor() {
-		// TODO Auto-generated constructor stub
 		this.mailGestor = new MailBox("gestor.dat");
 		this.mailEvitar = new MailBox("evitar.dat");
 		this.mailVaguear = new MailBox("vaguear.dat");
-		this.runtime = Runtime.getRuntime();
 
 	}
 
@@ -43,10 +43,22 @@ public class Gestor {
 					//escreve na caixa de correio do vaguear uma permissao
 					this.mailVaguear.write(prefixGestor + "start");
 					
+					//agumentos para o lançamento do processo
+					List<String> argsVaguear;
+					argsVaguear = new ArrayList<String>();
+					argsVaguear.add("java");
+					argsVaguear.add("-jar");
+					argsVaguear.add(jarVaguear);
+					argsVaguear.add("GUIA4");
+					argsVaguear.add(""+RobotLego.S_2);
+					argsVaguear.add("true");
 					
 					// caminho do jar vaguear
-					this.processVaguear = this.runtime.exec(jarVaguear);
-					System.out.println("duvida: " + this.processVaguear.isAlive());
+					ProcessBuilder pbVaguear;
+					pbVaguear = new ProcessBuilder(argsVaguear);
+					pbVaguear.redirectErrorStream(true);
+					pbVaguear.inheritIO();
+					this.processVaguear = pbVaguear.start();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -59,9 +71,22 @@ public class Gestor {
 					e.printStackTrace();
 				}
 				try {
-					// caminho do jar do evitar
-					this.processAvoid = this.runtime.exec(jarAvoid);
-					System.out.println("duvida2: " + this.processAvoid.isAlive());
+					//argumentos para o lançamento do processo
+					List<String> argsAvoid;
+					argsAvoid = new ArrayList<String>();
+					argsAvoid.add("java");
+					argsAvoid.add("-jar");
+					argsAvoid.add(jarAvoid);
+					argsAvoid.add("GUIA4");
+					argsAvoid.add(""+RobotLego.S_2);
+					argsAvoid.add("true");
+					
+					// caminho do jar vaguear
+					ProcessBuilder pbAvoid;
+					pbAvoid = new ProcessBuilder(argsAvoid);
+					pbAvoid.redirectErrorStream(true);
+					pbAvoid.inheritIO();
+					this.processAvoid = pbAvoid.start();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -126,7 +151,8 @@ public class Gestor {
 	
 	
 	public static void main(String []args){
-		Gestor ge = new Gestor();
+		Gestor ge;
+		ge = new Gestor();
 		ge.launchProcesses();
 	}
 

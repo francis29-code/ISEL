@@ -41,7 +41,6 @@ public class Vaguear implements ILogger {
 	public Vaguear(String name, int touchSensor, boolean simulateRobot) {
 		mailVaguear = new MailBox("vaguear.dat");
 		mailGestor = new MailBox("gestor.dat");
-		//mailGestor.write("lancei");
 		this.robotName = name;
 		this.currentDirection = Directions.Stop;
 
@@ -203,8 +202,16 @@ public class Vaguear implements ILogger {
 	}
 	
 	public static void main(String []args){
+		String nome;
+		int port;
+		boolean simulate;
 		
-		new Vaguear("GUIA4", 2, true).readMailBox();
+		nome = args[0];
+		port = Integer.parseInt(args[1]);
+		simulate = Boolean.parseBoolean(args[2]);
+		Vaguear v;
+		v = new Vaguear(nome, port, simulate);
+		v.readMailBox();
 		
 	}
 

@@ -23,6 +23,9 @@ public class RobotInterface extends JFrame {
 	private JTextField robotNameText;
 	private JRadioButton rdbtnOnoff;
 	private JCheckBox chckbxDebug;
+	private JCheckBox chckbxHandler;
+	private JCheckBox chckbxEvitar;
+	private JCheckBox chckbxWander;
 	private JTextField leftOffset;
 	private JTextField radiusText;
 	private JTextField angleText;
@@ -31,18 +34,30 @@ public class RobotInterface extends JFrame {
 	private JTextArea debugText;
 	private JButton btnClear;
 	private RobotLego robot;
+	//caixa de correio da GUI e dos restantes
+	//a manipulação das caixa de correio do evitar e vaguear, é se apenas selecionar-mos umas das duas boxes
+	//nunca as duas ao mesmo tempo
+	
+	private MailBox mailGUI,mailVaguear,mailEvitar, mailGestor;
 	
 	private String robotName;
 	private boolean radioState;
 	private boolean debugOnOff;
+	private boolean vaguear;
+	private boolean evitar;
+	private boolean gestor;
 	private int rightOffsetValue;
 	private int leftOffsetValue;
 	private int radius;
 	private int angle;
 	private int distance;
 
+
 	
 	private void myInit(){
+		this.vaguear = false;
+		this.evitar = false;
+		this.gestor = false;
 		this.radioState = false;
 		this.debugOnOff = false;
 		this.radius = 0;
@@ -52,6 +67,10 @@ public class RobotInterface extends JFrame {
 		this.leftOffsetValue = 0;
 		this.robotName = "Nome do Robot";
 		this.robot = new RobotLego();
+		this.mailGUI = new MailBox("gui.dat");
+		this.mailGestor = new MailBox("gestor.dat");
+		this.mailEvitar = new MailBox("evitar.dat");
+		this.mailVaguear = new MailBox("vaguear.dat");
 		
 		this.rdbtnOnoff.setSelected(this.radioState);
 		this.chckbxDebug.setSelected(this.debugOnOff);
@@ -456,6 +475,18 @@ public class RobotInterface extends JFrame {
 		});
 		btnClear.setBounds(22, 369, 89, 23);
 		contentPane.add(btnClear);
+		
+		chckbxHandler = new JCheckBox("Handler");
+		chckbxHandler.setBounds(30, 283, 97, 23);
+		contentPane.add(chckbxHandler);
+		
+		chckbxEvitar = new JCheckBox("Avoid");
+		chckbxEvitar.setBounds(30, 257, 97, 23);
+		contentPane.add(chckbxEvitar);
+		
+		chckbxWander = new JCheckBox("Wander");
+		chckbxWander.setBounds(30, 233, 97, 23);
+		contentPane.add(chckbxWander);
 		
 		this.setVisible(true);
 		
