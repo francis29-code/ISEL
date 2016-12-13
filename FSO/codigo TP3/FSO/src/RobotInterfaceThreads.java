@@ -39,7 +39,7 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 	
 	private boolean evitar,gestor,vaguear,segueparede;
 	
-	private Thread evitarT,gestorT,vaguearT,segueparedeT;
+//	private Thread evitarT,gestorT,vaguearT,segueparedeT;
 	
 	private VaguearT cVaguear;
 	
@@ -65,10 +65,10 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 
 	private void myInit() {
 		//inicia as threads a null
-		this.evitarT = null;
-		this.vaguearT = null;
-		this.gestorT = null;
-		this.segueparedeT = null;
+//		this.evitarT = null;
+//		this.vaguearT = null;
+//		this.gestorT = null;
+//		this.segueparedeT = null;
 		
 		//comportamentos a null------duvida, faz sentido?
 		this.cVaguear = null;
@@ -103,9 +103,8 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 	}
 	
 	private void launchThreads(){
-		this.cVaguear = new VaguearT(this.robot,this.s2);
-		this.vaguearT = cVaguear;
-		this.vaguearT.start();
+		this.cVaguear = new VaguearT(this.robot);
+		this.cVaguear.start();
 		showMessages(this.log("lançou thread"));
 	}
 	
@@ -197,6 +196,7 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 
 	private void actionForward() {
 		// TODO Auto-generated method stub
+		this.cVaguear.myResume();
 		try {
 			this.robot.Reta(this.distance);
 			this.robot.Parar(false);
@@ -218,6 +218,7 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 	}
 
 	private void actionRight() {
+		this.cVaguear.myEnding();
 		try {
 			this.robot.CurvarDireita(this.radius, this.angle);
 			this.robot.Parar(false);
@@ -229,7 +230,8 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 
 	private void actionLeft() {
 		//
-		this.cVaguear.trocaBoolean();
+//		this.cVaguear.myWait();
+		this.cVaguear.realseSem();
 		try {
 			this.robot.CurvarEsquerda(this.radius, this.angle);
 			this.robot.Parar(false);

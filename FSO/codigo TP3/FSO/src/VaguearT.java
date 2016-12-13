@@ -16,8 +16,14 @@ public class VaguearT extends Thread implements ILogger {
 	public enum Directions {
 		Stop, Right, Left, Forward
 	};
+	
+	public enum States{
+		Running, Waiting, Ending
+	};
 
 	public Directions currentDirection;
+	
+	public States currentState;
 
 	protected String robotName;
 
@@ -26,8 +32,7 @@ public class VaguearT extends Thread implements ILogger {
 	protected MyRobot theRobot;
 	
 	private Semaphore semaphore;
-	
-	private boolean troca;
+
 	
 	@Override
 	public String log(String message, Object... args) {
@@ -39,20 +44,14 @@ public class VaguearT extends Thread implements ILogger {
 		return aux;
 	}
 
-	public VaguearT(MyRobot robot, Semaphore semaphore) {
+	public VaguearT(MyRobot robot) {
 		this.currentDirection = Directions.Stop;
 		this.theRobot = robot;
-		this.semaphore = semaphore;
-		this.troca = false;
-
+		this.semaphore = new Semaphore(0);
+		this.currentState = States.Waiting;
 		this.rnd = new Random();
-
 	}
 	
-	public void trocaBoolean(){
-		this.troca = !this.troca;
-	}
-
 	private Directions getNextDirection() {
 		int aux;
 		aux = this.rnd.nextInt(90);
@@ -84,16 +83,27 @@ public class VaguearT extends Thread implements ILogger {
 		double perimeter = 2.0 * Math.PI * radius;
 		return angle * perimeter / 360.0;
 	}
+	
+	private double getSleepTime(double distance) {
+		double sleepTime;
+		sleepTime = distance * 5.0 / 100.0;
+
+		this.log("getSleepTime(%3.2f)->%3.2f", distance, sleepTime);
+
+		return sleepTime;
+	}
+
+	private double getSleepTime(double angle, double radius) {
+		return getSleepTime(getCurveDistance(angle, radius));
+	}
 
 	public void doWork() throws Exception {
-		boolean work;
-		work = true;
 
 		double radius, angle, distance;
 
 		double sleepTime = 0.0;
 
-		for (; work == true;) {
+		for (; this.currentState == States.Running;) {
 			Directions newDirection;
 
 			while ((newDirection = getNextDirection()) == this.currentDirection)
@@ -105,18 +115,21 @@ public class VaguearT extends Thread implements ILogger {
 			case Right:
 				radius = getRandomRadius();
 				angle = getRandomAngle();
+				sleepTime = getSleepTime(angle,radius);
 				this.theRobot.CurvarDireita((int) radius, (int) angle);
 				this.log("Right(%3.2f, %3.2f)->%3.2f", radius, angle, getCurveDistance(radius, angle));
 
 				break;
 			case Forward:
 				distance = getRandomDistance();
+				sleepTime = getSleepTime(distance);
 				this.theRobot.Reta((int) distance);
 				this.log("Forward(%3.2f)", distance);
 				break;
 			case Left:
 				radius = getRandomRadius();
 				angle = getRandomAngle();
+				sleepTime = getSleepTime(angle, radius);
 				this.theRobot.CurvarEsquerda((int) radius, (int) angle);
 				this.log("Left(%3.2f, %3.2f)->%3.2f", radius, angle, getCurveDistance(radius, angle));
 				break;
@@ -125,7 +138,7 @@ public class VaguearT extends Thread implements ILogger {
 			}
 			// Uncomment next line to force a stop after each movement
 			// this.theRobot.Parar( false );
-
+			Thread.sleep((int) (sleepTime*1000.0));
 			this.log("Sleep(%3.2f)", sleepTime);
 			///falta fazer check ao semaforo para parar o CICLO DO VAGUEAR WORK = FALSE
 
@@ -133,19 +146,59 @@ public class VaguearT extends Thread implements ILogger {
 		}
 	}
 	
+	public void myWait(){
+		//fica bloqueado sem fazer acção nenhuma
+		//até que a sua maquina de estados sofra alterações
+		try {
+			this.log("---------------------estou a espera no VAGUEAR---------------------");
+			this.semaphore.acquire();
+			this.log("---------------------DEI RELEASE DO SEMAFORO---------------------");
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//experimentar com gestor se funciona
+//		this.semaphore.release();
+	}
+	
+	public void realseSem(){
+		this.semaphore.release();
+	}
+	
+	public void myPause(){
+		//pausa o trabalho do vaguear, sem terminar o ciclo
+		this.currentState = States.Waiting;
+	}
+	
+	public void myResume(){
+		//inicia o comportamento do vaguear
+		this.currentState = States.Running;
+		this.semaphore.release();
+		this.log("---------------------estou a correr no VAGUEAR---------------------");
+	}
+	
+	public void myEnding(){
+		//encerra o trabalho da thread
+		this.currentState = States.Ending;
+		this.log("---------------------estou acabar o VAGUEAR---------------------");
+	}
+	
 	@Override
 	public void run(){
-		//automato principal na espera do semaphore
-		//acquire atraves de um booleano
-		//release
-		while(true){
-			if(this.troca){
-				this.log("troquei ---- VAGUEAR");
-			}else{
-				this.log("estou a correr ---- VAGUEAR");
+		while(this.currentState != States.Ending){
+			if(this.currentState == States.Waiting){
+				myWait();
 			}
-			
+			if(this.currentState == States.Running){
+				try {
+					doWork();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
+		
 		
 	}
 

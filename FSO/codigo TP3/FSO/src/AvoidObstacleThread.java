@@ -1,6 +1,7 @@
 import java.util.concurrent.Semaphore;
 
-public class AvoidObstacleThread implements ILogger {
+
+public class AvoidObstacleThread extends Thread implements ILogger {
 	final int MAX_DISTANCE = 15;
 
 	final int MAX_ANGLE = 90;
@@ -9,11 +10,17 @@ public class AvoidObstacleThread implements ILogger {
 
 	protected String robotName;
 
-	protected RobotLego theRobot;
+	protected MyRobot theRobot;
 	
 	private Semaphore semaphore;
-
 	
+	private boolean hit;
+
+	public enum States{
+		Running, Waiting, Ending
+	};
+	
+	private States currentState;
 
 	@Override
 	public String log(String message, Object... args) {
@@ -25,46 +32,87 @@ public class AvoidObstacleThread implements ILogger {
 		return aux;
 	}
 
-	public AvoidObstacleThread(RobotLego robot, Semaphore semaphore) {
-
+	public AvoidObstacleThread(MyRobot robot) {
+		this.currentState = States.Waiting;
 		this.theRobot = robot;
-		this.semaphore = semaphore;
+		this.semaphore = new Semaphore(0);
+		this.hit = false;
 
+	}
+	
+	public boolean readSensor(){
+		return this.theRobot.GetTouchSensor();
+	}
+	
+	public boolean hit(){
+		return this.hit;
+	}
+	
+	public void resetHit(){
+		this.hit = false;
 	}
 
 
 	public void doAvoidObstacle() {
-
-		// double sleep = 0.;
-		//corrigir automato para ler o sensor
-//		while (readSensor()) {
-//			try {
-//				this.theRobot.Reta(-MAX_DISTANCE);//				// this.log("backwards(%3.2d)", MAX_DISTANCE);
-//				this.theRobot.CurvarEsquerda(MAX_RADIUS, MAX_ANGLE);
-//				// this.log("Right(%3.2d, %3.2d)->%3.2d", MAX_RADIUS, MAX_ANGLE,
-//				// sleep = getSleepTime(MAX_RADIUS,
-//				// MAX_ANGLE)+getSleepTime(MAX_DISTANCE);
-//
-//				Thread.sleep(600);
-//				// Thread.sleep(1000);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			this.theRobot.Parar(true);
-//		}
-		this.theRobot.CloseNXT();
-
+		while(this.currentState != States.Ending){
+			if(this.currentState == States.Waiting){
+				if(readSensor()){
+					this.theRobot.Parar(true);
+					this.hit=true;
+				}
+			}
+			if(this.currentState == States.Running){
+				try {
+					this.semaphore.acquire();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				this.theRobot.Reta(-MAX_DISTANCE);
+				this.theRobot.CurvarEsquerda(MAX_RADIUS, MAX_ANGLE);
+				this.theRobot.Parar(false);
+				this.semaphore.release();
+			}
+		}
 	}
-
-
-	public static void main(String[] args) {
-		RobotLego robot;
-		robot = new RobotLego();
-		AvoidObstacleThread ao;
-		ao = new AvoidObstacleThread(robot, new Semaphore(1));
-
-
+	
+	public void myWait(){
+		//fica bloqueado sem fazer acção nenhuma
+		//até que a sua maquina de estados sofra alterações
+		try {
+			this.log("---------------------estou a espera no VAGUEAR---------------------");
+			this.semaphore.acquire();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//experimentar com gestor se funciona
+//		this.semaphore.release();
+	}
+	
+	public void myPause(){
+		//pausa o trabalho do vaguear, sem terminar o ciclo
+		this.currentState = States.Waiting;
+	}
+	
+	public void myResume(){
+		//inicia o comportamento do vaguear
+		this.currentState = States.Running;
+		this.semaphore.release();
+		this.log("---------------------estou a correr no VAGUEAR---------------------");
+	}
+	
+	public void myEnding(){
+		//encerra o trabalho da thread
+		this.currentState = States.Ending;
+		this.log("---------------------estou acabar o VAGUEAR---------------------");
+	}
+	
+	@Override
+	public void run(){
+		
+		
+		
 	}
 
 }
