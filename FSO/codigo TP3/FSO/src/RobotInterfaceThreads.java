@@ -42,8 +42,10 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 //	private Thread evitarT,gestorT,vaguearT,segueparedeT;
 	
 	private VaguearT cVaguear;
+	private AvoidObstacleThread cEvitar;
+	private GestorThread cGestor;
 	
-	private Semaphore s1,s2;
+	private Semaphore acessoRobot;
 
 	private String robotName;
 	private boolean radioState;
@@ -72,10 +74,11 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 		
 		//comportamentos a null------duvida, faz sentido?
 		this.cVaguear = null;
+		this.cEvitar = null;
+		this.cGestor = null;
 		
 		//semaforos a null
-		this.s1 = null;
-		this.s2 = null;
+		this.acessoRobot = null;
 		
 		//variaveis de controlo da checkboxes
 		this.vaguear = false;
@@ -93,6 +96,8 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 		this.robotName = "Nome do Robot";
 		//para simulaçoes True, para fisico False
 		this.robot = new MyRobot(true,this);
+		//set ao sensor do robot
+		this.robot.SetTouchSensor(RobotLego.S_2);
 
 		this.rdbtnOnoff.setSelected(this.radioState);
 		this.chckbxDebug.setSelected(this.debugOnOff);
@@ -105,7 +110,11 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 	private void launchThreads(){
 		this.cVaguear = new VaguearT(this.robot);
 		this.cVaguear.start();
-		showMessages(this.log("lançou thread"));
+		this.cEvitar = new AvoidObstacleThread(this.robot);
+		this.cEvitar.start();
+		this.cGestor = new GestorThread(this.cVaguear, this.cEvitar);
+		this.cGestor.start();
+		showMessages(this.log("lançou threads"));
 	}
 	
 
@@ -196,7 +205,6 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 
 	private void actionForward() {
 		// TODO Auto-generated method stub
-		this.cVaguear.myResume();
 		try {
 			this.robot.Reta(this.distance);
 			this.robot.Parar(false);
@@ -231,7 +239,6 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 	private void actionLeft() {
 		//
 //		this.cVaguear.myWait();
-		this.cVaguear.realseSem();
 		try {
 			this.robot.CurvarEsquerda(this.radius, this.angle);
 			this.robot.Parar(false);
@@ -500,6 +507,12 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 				gestor = !gestor;
 				chckbxEvitar.setEnabled(!gestor);
 				chckbxWander.setEnabled(!gestor);
+				
+				if(!gestor){
+					cGestor.myPause();
+				}else{
+					cGestor.myResume();
+				}
 				
 			}
 		});

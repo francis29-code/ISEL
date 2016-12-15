@@ -16,24 +16,23 @@ public class VaguearT extends Thread implements ILogger {
 	public enum Directions {
 		Stop, Right, Left, Forward
 	};
-	
-	public enum States{
+
+	public enum States {
 		Running, Waiting, Ending
 	};
 
 	public Directions currentDirection;
-	
+
 	public States currentState;
 
 	protected String robotName;
 
 	protected Random rnd;
-	
+
 	protected MyRobot theRobot;
-	
+
 	private Semaphore semaphore;
 
-	
 	@Override
 	public String log(String message, Object... args) {
 		String aux;
@@ -51,7 +50,7 @@ public class VaguearT extends Thread implements ILogger {
 		this.currentState = States.Waiting;
 		this.rnd = new Random();
 	}
-	
+
 	private Directions getNextDirection() {
 		int aux;
 		aux = this.rnd.nextInt(90);
@@ -83,7 +82,7 @@ public class VaguearT extends Thread implements ILogger {
 		double perimeter = 2.0 * Math.PI * radius;
 		return angle * perimeter / 360.0;
 	}
-	
+
 	private double getSleepTime(double distance) {
 		double sleepTime;
 		sleepTime = distance * 5.0 / 100.0;
@@ -115,7 +114,7 @@ public class VaguearT extends Thread implements ILogger {
 			case Right:
 				radius = getRandomRadius();
 				angle = getRandomAngle();
-				sleepTime = getSleepTime(angle,radius);
+				sleepTime = getSleepTime(angle, radius);
 				this.theRobot.CurvarDireita((int) radius, (int) angle);
 				this.log("Right(%3.2f, %3.2f)->%3.2f", radius, angle, getCurveDistance(radius, angle));
 
@@ -138,69 +137,76 @@ public class VaguearT extends Thread implements ILogger {
 			}
 			// Uncomment next line to force a stop after each movement
 			// this.theRobot.Parar( false );
-			Thread.sleep((int) (sleepTime*1000.0));
+			Thread.sleep((int) (sleepTime * 1000.0));
 			this.log("Sleep(%3.2f)", sleepTime);
-			///falta fazer check ao semaforo para parar o CICLO DO VAGUEAR WORK = FALSE
+			/// falta fazer check ao semaforo para parar o CICLO DO VAGUEAR WORK
+			/// = FALSE
 
-//			this.theRobot.CloseNXT();
+			// this.theRobot.CloseNXT();
 		}
 	}
-	
-	public void myWait(){
-		//fica bloqueado sem fazer acção nenhuma
-		//até que a sua maquina de estados sofra alterações
+
+	public void myWait() {
+		// fica bloqueado sem fazer acção nenhuma
+		// até que a sua maquina de estados sofra alterações
 		try {
-			this.log("---------------------estou a espera no VAGUEAR---------------------");
+
 			this.semaphore.acquire();
-			this.log("---------------------DEI RELEASE DO SEMAFORO---------------------");
+			// this.log("---------------------estou a espera no
+			// VAGUEAR---------------------");
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//experimentar com gestor se funciona
-//		this.semaphore.release();
+		// experimentar com gestor se funciona
+		// this.semaphore.release();
 	}
-	
-	public void realseSem(){
-		this.semaphore.release();
-	}
-	
-	public void myPause(){
-		//pausa o trabalho do vaguear, sem terminar o ciclo
+
+	public void myPause() {
+		// pausa o trabalho do vaguear, sem terminar o ciclo
 		this.currentState = States.Waiting;
+		// this.log("---------------------pausei no
+		// VAGUEAR---------------------");
 	}
-	
-	public void myResume(){
-		//inicia o comportamento do vaguear
+
+	public void myResume() {
+		// inicia o comportamento do vaguear
 		this.currentState = States.Running;
 		this.semaphore.release();
-		this.log("---------------------estou a correr no VAGUEAR---------------------");
+		// this.log("---------------------estou a correr no
+		// VAGUEAR---------------------");
 	}
-	
-	public void myEnding(){
-		//encerra o trabalho da thread
+
+	public void myEnding() {
+		// encerra o trabalho da thread
 		this.currentState = States.Ending;
-		this.log("---------------------estou acabar o VAGUEAR---------------------");
+		// this.log("---------------------estou acabar o
+		// VAGUEAR---------------------");
 	}
-	
+
 	@Override
-	public void run(){
-		while(this.currentState != States.Ending){
-			if(this.currentState == States.Waiting){
+	public void run() {
+		while (this.currentState != States.Ending) {
+			switch (this.currentState) {
+			case Waiting:
 				myWait();
-			}
-			if(this.currentState == States.Running){
+				break;
+
+			case Running:
 				try {
+					// this.semaphore.acquire();
 					doWork();
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				break;
+			default:
+				break;
 			}
-		}
-		
-		
-	}
 
+		}
+
+	}
 
 }

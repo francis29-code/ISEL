@@ -1,36 +1,115 @@
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.Semaphore;
 
-public class GestorThread {
-
-	// tempo de espera para ler o proprio ficheiro
-	private static final int SLEEP_TIME = 1000;
-	// caixas de correio para cada processo
+public class GestorThread extends Thread implements ILogger{
 	
-	public enum States {Vaguear, Evitar, SegueParede, Terminar, Init};
-	private States estado;
+	public enum States {Vaguear, Evitar, SegueParede, Terminar, Check, Init};
+	private States currentState;
+	
+	private VaguearT vaguear;
+	private AvoidObstacleThread evitar;
+	private Semaphore semaphore;
+	
+	@Override
+	public String log(String message, Object... args) {
+		String aux;
+		aux = String.format(message, args);
 
-	public GestorThread(VaguearT vaguear, AvoidObstacleThread avoid) {
-		this.estado = States.Init;
+		System.out.println(aux);
 
+		return aux;
 	}
 
-	public void launchProcesses() {
+	public GestorThread(VaguearT vaguear, AvoidObstacleThread avoid) {
+		this.currentState = States.Init;
+		this.semaphore = new Semaphore(0);
+		this.vaguear = vaguear;
+		this.evitar = avoid;
 
-		while (this.estado != States.Terminar) {
-			switch (this.estado) {
+	}
+	
+	public void myWait(){
+		//fica bloqueado sem fazer acção nenhuma
+		//até que a sua maquina de estados sofra alterações
+		try {
+			
+			this.semaphore.acquire();
+//			this.log("---------------------estou a espera no GESTOR---------------------");
+			//apena coloca o evitar a ler se foi dada permissão de troca
+			//para o estado Vaguears
+			this.evitar.myStart();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//experimentar com gestor se funciona
+//		this.semaphore.release();
+	}
+	
+	public void myPause(){
+		//pausa o trabalho do vaguear, sem terminar o ciclo
+		this.currentState = States.Init;
+		//quando o gestor é disabled, todas as threads ficam em pausa
+		this.vaguear.myPause();
+		this.evitar.myPause();
+//		this.log("---------------------pausei no GESTOR---------------------");
+	}
+	
+	public void myResume(){
+		//inicia o comportamento do vaguear
+		this.currentState = States.Vaguear;
+		this.semaphore.release();
+//		this.log("---------------------estou a correr no GESTOR---------------------");
+	}
+	
+	public void myEnding(){
+		//encerra o trabalho da thread
+		this.currentState = States.Terminar;
+//		this.log("---------------------estou acabar o GESTOR---------------------");
+	}
+	
+	
+	@Override
+	public void run() {
+
+		while (this.currentState != States.Terminar) {
+			switch (this.currentState) {
+			
 			case Init:
-				System.out.println("estado: init");
-				
+				myWait();
+				break;
+			
+			case Check:
+//				this.log("estado: check");
+				if(this.evitar.hit()){
+					this.evitar.resetHit();
+					this.vaguear.myPause();
+					this.currentState = States.Evitar;
+				}
+
+				break;
 
 			case Vaguear:
-				System.out.println("estado vaguear");
-				
+				this.log("estado: Vaguear");
+				this.vaguear.myResume();
+				this.currentState = States.Check;
+				break;
 				
 			case Evitar:
-				System.out.println("estado avoid");
+				this.log("estado: Evitar");
+				this.evitar.myResume();
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				this.currentState = States.Vaguear;
+				break;
 				
+			case SegueParede:
+				this.log("estado: SegueParede");
+				
+				break;
 			default:
 				break;
 				
