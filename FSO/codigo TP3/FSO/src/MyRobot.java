@@ -15,6 +15,8 @@ public class MyRobot {
 	
 	protected int touchSensor;
 	
+	protected int sensorUS;
+	
 	private final boolean simulateRobot;
 	
 	private final Random rnd;
@@ -126,6 +128,16 @@ public class MyRobot {
     }
   }
 	
+	public void SetSensorUS(int sensorUS){
+		this.sensorUS = sensorUS;
+		if ( this.simulateRobot==false) {
+		      this.robot.SetSensorSound(this.sensorUS);
+		    }
+		    else {
+		      this.theLogger.log( "SetSensorUS(sensorUS->%d)", this.sensorUS );
+		    }
+	}
+	
 	public boolean GetTouchSensor() {
     if ( this.simulateRobot==false) {
       return this.robot.Sensor( this.touchSensor )==1;
@@ -136,6 +148,16 @@ public class MyRobot {
     }
   }
 	
+	public int GetSensorUS(){
+	    if ( this.simulateRobot==false) {
+	        return this.robot.SensorUS(this.sensorUS);
+	      }
+	      else {
+	        this.theLogger.log( "GetSensorUS()" );
+	        return this.rnd.nextInt(255);
+	      }
+	}
+	
 	public int GetSensorDelay() {
 	  if ( this.simulateRobot==false) {
       return SensorMessageTime;
@@ -144,4 +166,5 @@ public class MyRobot {
 	    return 0;
 	  }
 	}
+	
 }

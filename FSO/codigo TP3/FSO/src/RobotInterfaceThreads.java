@@ -44,6 +44,7 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 	private VaguearT cVaguear;
 	private AvoidObstacleThread cEvitar;
 	private GestorThread cGestor;
+	private SegueParede cSegue;
 	
 	private Semaphore acessoRobot;
 
@@ -55,6 +56,7 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 	private int radius;
 	private int angle;
 	private int distance;
+	private JCheckBox chckbxFollow;
 	
 	public String log(String message, Object... args) {
 		String aux;
@@ -76,9 +78,10 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 		this.cVaguear = null;
 		this.cEvitar = null;
 		this.cGestor = null;
+		this.cSegue = null;
 		
 		//semaforos a null
-		this.acessoRobot = null;
+		this.acessoRobot = new Semaphore(0);
 		
 		//variaveis de controlo da checkboxes
 		this.vaguear = false;
@@ -98,6 +101,7 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 		this.robot = new MyRobot(true,this);
 		//set ao sensor do robot
 		this.robot.SetTouchSensor(RobotLego.S_2);
+		this.robot.SetSensorUS(RobotLego.S_3);
 
 		this.rdbtnOnoff.setSelected(this.radioState);
 		this.chckbxDebug.setSelected(this.debugOnOff);
@@ -108,12 +112,15 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 	}
 	
 	private void launchThreads(){
-		this.cVaguear = new VaguearT(this.robot);
+		this.cVaguear = new VaguearT(this.robot,this.acessoRobot);
 		this.cVaguear.start();
-		this.cEvitar = new AvoidObstacleThread(this.robot);
+		this.cEvitar = new AvoidObstacleThread(this.robot,this.acessoRobot);
 		this.cEvitar.start();
-		this.cGestor = new GestorThread(this.cVaguear, this.cEvitar);
+		this.cSegue = new SegueParede(this.robot,this.acessoRobot);
+		this.cSegue.start();
+		this.cGestor = new GestorThread(this.cVaguear, this.cEvitar, this.cSegue);
 		this.cGestor.start();
+		
 		showMessages(this.log("lançou threads"));
 	}
 	
@@ -507,6 +514,7 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 				gestor = !gestor;
 				chckbxEvitar.setEnabled(!gestor);
 				chckbxWander.setEnabled(!gestor);
+				chckbxFollow.setEnabled(!gestor);
 				
 				if(!gestor){
 					cGestor.myPause();
@@ -525,7 +533,7 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 				evitar = !evitar;
 				chckbxHandler.setEnabled(!evitar);
 				chckbxWander.setEnabled(!evitar);
-				
+				chckbxFollow.setEnabled(!evitar);
 			}
 		});
 		chckbxEvitar.setBounds(30, 257, 97, 23);
@@ -537,11 +545,23 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 				vaguear = !vaguear;
 				chckbxEvitar.setEnabled(!vaguear);
 				chckbxHandler.setEnabled(!vaguear);
-				
+				chckbxFollow.setEnabled(!vaguear);
 			}
 		});
 		chckbxWander.setBounds(30, 233, 89, 23);
 		contentPane.add(chckbxWander);
+		
+		chckbxFollow = new JCheckBox("Follow");
+		chckbxFollow.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				segueparede = !segueparede;
+				chckbxEvitar.setEnabled(!segueparede);
+				chckbxHandler.setEnabled(!segueparede);
+				chckbxWander.setEnabled(!segueparede);
+			}
+		});
+		chckbxFollow.setBounds(30, 211, 81, 23);
+		contentPane.add(chckbxFollow);
 
 		this.setVisible(true);
 

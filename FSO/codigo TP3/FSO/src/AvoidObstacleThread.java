@@ -31,10 +31,10 @@ public class AvoidObstacleThread extends Thread implements ILogger {
 		return aux;
 	}
 
-	public AvoidObstacleThread(MyRobot robot) {
+	public AvoidObstacleThread(MyRobot robot, Semaphore semaphore) {
 		this.currentState = States.Waiting;
 		this.theRobot = robot;
-		this.semaphore = new Semaphore(0);
+		this.semaphore = semaphore;
 		this.hit = false;
 
 	}
@@ -57,6 +57,7 @@ public class AvoidObstacleThread extends Thread implements ILogger {
 
 			switch (this.currentState) {
 			case Waiting:
+				//estado inicial quando se liga o robot na interface grafica
 				myWaiting();
 				break;
 			case Reading:
@@ -74,16 +75,16 @@ public class AvoidObstacleThread extends Thread implements ILogger {
 	}
 
 	private void myWaiting() {
-		try {
-			// fica bloqueado sem fazer acção nenhuma
-			// até que a sua maquina de estados sofra alterações
-			// this.log("ANTES DO SEMAFORO EVITAR");
-			this.semaphore.acquire();
-			// this.log("DEPOIS DO SEMAFORO EVITAR");
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			// fica bloqueado sem fazer acção nenhuma
+//			// até que a sua maquina de estados sofra alterações
+//			// this.log("ANTES DO SEMAFORO EVITAR");
+//			this.semaphore.acquire();
+//			// this.log("DEPOIS DO SEMAFORO EVITAR");
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 	private void myAction() {
@@ -100,7 +101,6 @@ public class AvoidObstacleThread extends Thread implements ILogger {
 	}
 
 	private void myReading() {
-
 		// this.log("---------------------esperando no
 		// EVITAR---------------------");
 		if (readSensor()) {
@@ -108,17 +108,18 @@ public class AvoidObstacleThread extends Thread implements ILogger {
 			this.theRobot.Parar(true);
 			this.hit = true;
 		}
+		
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 	}
 
 	public void myStart() {
 		this.currentState = States.Reading;
-		this.semaphore.release();
 	}
 
 	public void myPause() {

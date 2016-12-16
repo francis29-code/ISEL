@@ -43,10 +43,10 @@ public class VaguearT extends Thread implements ILogger {
 		return aux;
 	}
 
-	public VaguearT(MyRobot robot) {
+	public VaguearT(MyRobot robot, Semaphore semaphore) {
 		this.currentDirection = Directions.Stop;
 		this.theRobot = robot;
-		this.semaphore = new Semaphore(0);
+		this.semaphore = semaphore;
 		this.currentState = States.Waiting;
 		this.rnd = new Random();
 	}
@@ -149,15 +149,15 @@ public class VaguearT extends Thread implements ILogger {
 	public void myWait() {
 		// fica bloqueado sem fazer acção nenhuma
 		// até que a sua maquina de estados sofra alterações
-		try {
-
-			this.semaphore.acquire();
-			// this.log("---------------------estou a espera no
-			// VAGUEAR---------------------");
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//
+//			this.semaphore.acquire();
+//			// this.log("---------------------estou a espera no
+//			// VAGUEAR---------------------");
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		// experimentar com gestor se funciona
 		// this.semaphore.release();
 	}
@@ -194,7 +194,7 @@ public class VaguearT extends Thread implements ILogger {
 
 			case Running:
 				try {
-					// this.semaphore.acquire();
+					this.semaphore.acquire();
 					doWork();
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
