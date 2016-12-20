@@ -2,7 +2,7 @@ import java.util.concurrent.Semaphore;
 
 public class SegueParede extends Thread implements ILogger {
 	
-	final static int DISTANCIA_CONTROLO = 10;//cm
+	private int distCtrl;
 
 	private MyRobot robot;
 	
@@ -11,7 +11,7 @@ public class SegueParede extends Thread implements ILogger {
 	private int lastDistance;
 
 	private enum States {
-		Waiting, Running, Reading, Ending
+		Waiting, Running, Ending, Control
 	}
 
 	private States currentState;
@@ -28,6 +28,7 @@ public class SegueParede extends Thread implements ILogger {
 
 	public SegueParede(MyRobot robot, Semaphore semaphore) {
 		// TODO Auto-generated constructor stub
+		this.distCtrl = 0;
 		this.robot = robot;
 		this.currentState = States.Waiting;
 		this.semaphore = semaphore;
@@ -36,6 +37,10 @@ public class SegueParede extends Thread implements ILogger {
 
 	public void myPause() {
 		this.currentState = States.Waiting;
+	}
+	
+	public void setDistanceCTRL(int distance){
+		this.distCtrl = distance;
 	}
 
 	public void myResume() {
@@ -47,40 +52,46 @@ public class SegueParede extends Thread implements ILogger {
 		this.currentState = States.Ending;
 	}
 	
-	private void myReading(){
-		this.lastDistance = this.robot.GetSensorUS();
+	public void myControlState(){
+		this.currentState = States.Control;
+		this.semaphore.release();
 	}
 	
-	public int getLastDistance(){
-		return this.lastDistance;
+//	private void myReading(){
+//		this.lastDistance = this.robot.GetSensorUS();
+//	}
+	public void settLastDistance(int distance){
+		this.lastDistance = distance;
 	}
 	
-	private void myAction(){
+	private void myControl(){
 		
 		try {
 			this.semaphore.acquire();
-			this.robot.Reta(DISTANCIA_CONTROLO);
+			this.robot.Reta(this.distCtrl);
 			//espera que ande a distancia de controlo
-			Thread.sleep(1000);
-			int aux = this.robot.GetSensorUS();
-			if(aux > 100){
-				this.currentState = States.Waiting;
-			}else{
-				double radianos = Math.atan((getLastDistance()-aux)/DISTANCIA_CONTROLO);
-				double degrees = Math.toDegrees(radianos);
-				this.robot.CurvarEsquerda(0, (int)degrees);
-				this.lastDistance = aux;
-				//falta fazer verificação de acertos nos angulos
-				//caso o robot se esteja afastar da parede -------> CURVAR DIREITA
-			}
-			
+			Thread.sleep((int)(this.distCtrl * 5.0 / 100.0));
+			this.currentState = States.Running;
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	private void myAction(){
+		int aux = this.robot.GetSensorUS();
+		if(aux < 100 && aux > 20){
+			this.currentState = States.Waiting;
+		}else{
+			double radianos = Math.atan((this.lastDistance-aux)/this.distCtrl);
+			double degrees = Math.toDegrees(radianos);
+			this.robot.CurvarEsquerda(0, (int)degrees);
+			this.lastDistance = aux;
+			//falta fazer verificação de acertos nos angulos
+			//caso o robot se esteja afastar da parede -------> CURVAR DIREITA
+		}
 		
-
-		
+	
 	}
 
 	@Override
@@ -90,15 +101,15 @@ public class SegueParede extends Thread implements ILogger {
 			case Waiting:
 				//estado inicial quando se liga o robot na interface grafica
 				break;
-
-			case Reading:
-				myReading();
+				
+			case Control:
+				myControl();
 				break;
 
 			case Running:
 				myAction();
 				break;
-
+	
 			default:
 				break;
 			}

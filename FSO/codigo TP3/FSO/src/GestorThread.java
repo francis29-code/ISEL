@@ -8,6 +8,7 @@ public class GestorThread extends Thread implements ILogger{
 	private VaguearT vaguear;
 	private AvoidObstacleThread evitar;
 	private SegueParede segue;
+	private MyRobot robot;
 //	private Semaphore semaphore;
 	
 	@Override
@@ -20,12 +21,13 @@ public class GestorThread extends Thread implements ILogger{
 		return aux;
 	}
 
-	public GestorThread(VaguearT vaguear, AvoidObstacleThread avoid, SegueParede segue) {
+	public GestorThread(MyRobot robot, VaguearT vaguear, AvoidObstacleThread avoid, SegueParede segue) {
 		this.currentState = States.Init;
 //		this.semaphore = new Semaphore(0);
 		this.vaguear = vaguear;
 		this.evitar = avoid;
 		this.segue = segue;
+		this.robot = robot;
 
 	}
 	
@@ -74,6 +76,9 @@ public class GestorThread extends Thread implements ILogger{
 	
 	@Override
 	public void run() {
+		
+		int distanceRead;
+		distanceRead =0;
 
 		while (this.currentState != States.Terminar) {
 			switch (this.currentState) {
@@ -91,8 +96,10 @@ public class GestorThread extends Thread implements ILogger{
 					this.currentState = States.Evitar;
 				}
 				
-				if(this.segue.getLastDistance() > 20 || this.segue.getLastDistance() < 100){
+				distanceRead = this.robot.GetSensorUS();
+				if(distanceRead>20 && distanceRead<100){
 					this.vaguear.myPause();
+					this.segue.settLastDistance(distanceRead);
 					this.currentState = States.SegueParede;
 				}
 
@@ -107,21 +114,18 @@ public class GestorThread extends Thread implements ILogger{
 			case Evitar:
 				this.log("estado: Evitar");
 				this.evitar.myResume();
-//				try {
-//					Thread.sleep(2000);
-//				} catch (InterruptedException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				this.currentState = States.Vaguear;
 				break;
 				
 			case SegueParede:
 				this.log("estado: SegueParede");
-				this.segue.myResume();
-				if(this.segue.getLastDistance() < 20 || this.segue.getLastDistance() > 100){
-					this.currentState = States.Vaguear;
-				}
+				this.segue.myControlState();
 				break;
 			default:
 				break;

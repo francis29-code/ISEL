@@ -128,7 +128,7 @@ public class MyRobot {
     }
   }
 	
-	public void SetSensorUS(int sensorUS){
+	public void SetSensorLowSpeed(int sensorUS){
 		this.sensorUS = sensorUS;
 		if ( this.simulateRobot==false) {
 		      this.robot.SetSensorSound(this.sensorUS);
@@ -154,7 +154,7 @@ public class MyRobot {
 	      }
 	      else {
 	        this.theLogger.log( "GetSensorUS()" );
-	        return this.rnd.nextInt(255);
+	        return this.rnd.nextInt(2555)/10;
 	      }
 	}
 	
@@ -165,6 +165,20 @@ public class MyRobot {
 	  else {
 	    return 0;
 	  }
+	}
+	
+	
+	
+	public static void main(String[] args){
+		Random rnd;
+		rnd = new Random();
+		int a =0;
+		for(int i=0;i<7;i++){
+			a = rnd.nextInt(2555)/10;
+			System.out.println("numero "+i+": "+a+"\n");
+		}
+		
+		
 	}
 	
 }

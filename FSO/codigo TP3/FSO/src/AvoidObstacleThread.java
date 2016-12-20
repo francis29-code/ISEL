@@ -40,7 +40,14 @@ public class AvoidObstacleThread extends Thread implements ILogger {
 	}
 
 	public boolean readSensor() {
-		return this.theRobot.GetTouchSensor();
+		boolean aux = this.theRobot.GetTouchSensor();
+		if(!aux){
+			return false;
+		}
+		else{
+			return true;
+		}
+		 
 	}
 
 	public boolean hit() {

@@ -34,8 +34,8 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 	private JTextField rightOffset;
 	private JTextArea debugText;
 	private JButton btnClear;
-	private int sensor = RobotLego.S_2; 
 	private MyRobot robot;
+//	private RobotLego robot;
 	
 	private boolean evitar,gestor,vaguear,segueparede;
 	
@@ -53,10 +53,12 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 	private boolean debugOnOff;
 	private int rightOffsetValue;
 	private int leftOffsetValue;
+	private int distCtrl;
 	private int radius;
 	private int angle;
 	private int distance;
 	private JCheckBox chckbxFollow;
+	private JTextField d_ctrlTextfield;
 	
 	public String log(String message, Object... args) {
 		String aux;
@@ -92,16 +94,18 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 		this.radioState = false;
 		this.debugOnOff = false;
 		this.radius = 0;
-		this.angle = 0;
+		this.angle = 0; 
 		this.distance = 0;
 		this.rightOffsetValue = 0;
 		this.leftOffsetValue = 0;
+		this.distCtrl = 0;
 		this.robotName = "Nome do Robot";
 		//para simulaçoes True, para fisico False
+		//this.robot = new MyRobot(false,this);
 		this.robot = new MyRobot(true,this);
 		//set ao sensor do robot
 		this.robot.SetTouchSensor(RobotLego.S_2);
-		this.robot.SetSensorUS(RobotLego.S_3);
+		this.robot.SetSensorLowSpeed(RobotLego.S_1);
 
 		this.rdbtnOnoff.setSelected(this.radioState);
 		this.chckbxDebug.setSelected(this.debugOnOff);
@@ -118,7 +122,7 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 		this.cEvitar.start();
 		this.cSegue = new SegueParede(this.robot,this.acessoRobot);
 		this.cSegue.start();
-		this.cGestor = new GestorThread(this.cVaguear, this.cEvitar, this.cSegue);
+		this.cGestor = new GestorThread(this.robot, this.cVaguear, this.cEvitar, this.cSegue);
 		this.cGestor.start();
 		
 		showMessages(this.log("lançou threads"));
@@ -169,6 +173,14 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 	private void setRadius(String radius) {
 		try {
 			this.radius = Integer.parseInt(radius);
+		} catch (Exception e) {
+			showMessages("Erro seguinte: " + e.getMessage());
+		}
+	}
+	
+	private void setDistCtrl(String distance){
+		try{	
+			this.distCtrl = Integer.parseInt(distance);
 		} catch (Exception e) {
 			showMessages("Erro seguinte: " + e.getMessage());
 		}
@@ -562,6 +574,28 @@ public class RobotInterfaceThreads extends JFrame implements ILogger{
 		});
 		chckbxFollow.setBounds(30, 211, 81, 23);
 		contentPane.add(chckbxFollow);
+		
+		d_ctrlTextfield = new JTextField();
+		d_ctrlTextfield.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setDistCtrl(d_ctrlTextfield.getText());
+				if(radioState){
+					cSegue.setDistanceCTRL(distCtrl);
+				}
+				showMessages("dist_ctrl -> " + distCtrl);
+			}
+		});
+		d_ctrlTextfield.setBounds(57, 105, 31, 20);
+		contentPane.add(d_ctrlTextfield);
+		d_ctrlTextfield.setColumns(10);
+		
+		JLabel lblDctrl = new JLabel("d-ctrl");
+		lblDctrl.setBounds(10, 108, 46, 14);
+		contentPane.add(lblDctrl);
+		
+		JLabel lblCm_2 = new JLabel("cm");
+		lblCm_2.setBounds(98, 108, 46, 14);
+		contentPane.add(lblCm_2);
 
 		this.setVisible(true);
 
