@@ -36,7 +36,7 @@ public class AvoidObstacleThread extends Thread implements ILogger {
 		this.theRobot = robot;
 		this.semaphore = semaphore;
 		this.hit = false;
-
+		this.setName("evitar");
 	}
 
 	public boolean readSensor() {

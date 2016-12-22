@@ -4,6 +4,7 @@ public class GestorThread extends Thread implements ILogger{
 	
 	public enum States {Vaguear, Evitar, SegueParede, Terminar, Check, Init};
 	private States currentState;
+	private States lastState;
 	
 	private VaguearT vaguear;
 	private AvoidObstacleThread evitar;
@@ -23,6 +24,7 @@ public class GestorThread extends Thread implements ILogger{
 
 	public GestorThread(MyRobot robot, VaguearT vaguear, AvoidObstacleThread avoid, SegueParede segue) {
 		this.currentState = States.Init;
+		this.lastState = null;
 //		this.semaphore = new Semaphore(0);
 		this.vaguear = vaguear;
 		this.evitar = avoid;
@@ -30,6 +32,7 @@ public class GestorThread extends Thread implements ILogger{
 		this.robot = robot;
 
 	}
+	
 	
 	public void myWait(){
 		//fica bloqueado sem fazer acção nenhuma
@@ -79,6 +82,8 @@ public class GestorThread extends Thread implements ILogger{
 		
 		int distanceRead;
 		distanceRead =0;
+		boolean aux;
+		aux = false;
 
 		while (this.currentState != States.Terminar) {
 			switch (this.currentState) {
@@ -89,20 +94,34 @@ public class GestorThread extends Thread implements ILogger{
 				break;
 			
 			case Check:
+				//ler sensor com a mesma proporcianalidade de tempo da distancia de controlo
+				//1 segundo
+				
+				try {
+					Thread.sleep((this.segue.getDistanceCTRL() *5/100)*1000);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
 //				this.log("estado: check");
+				distanceRead = this.robot.GetSensorUS();
+				this.log(""+distanceRead);
+				aux = (distanceRead>20 && distanceRead<100);
 				if(this.evitar.hit()){
 					this.evitar.resetHit();
 					this.vaguear.myPause();
 					this.currentState = States.Evitar;
 				}
-				
-				distanceRead = this.robot.GetSensorUS();
-				if(distanceRead>20 && distanceRead<100){
+				else if(aux){
+					this.log("ENTREI NO SEGUIR PAREDE-------------------------");
 					this.vaguear.myPause();
-					this.segue.settLastDistance(distanceRead);
+					this.segue.myResume();
 					this.currentState = States.SegueParede;
 				}
-
+				else if(!(this.evitar.hit() || aux)){
+					this.currentState = States.Vaguear;
+				}
 				break;
 
 			case Vaguear:
@@ -115,18 +134,31 @@ public class GestorThread extends Thread implements ILogger{
 				this.log("estado: Evitar");
 				this.evitar.myResume();
 				try {
-					Thread.sleep(2000);
+					Thread.sleep(4000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				this.currentState = States.Vaguear;
+				this.currentState = States.Check;
 				break;
 				
 			case SegueParede:
-				this.log("estado: SegueParede");
-				this.segue.myControlState();
-				break;
+//				this.log("estado: SegueParede");
+				if(this.segue.currentState() == 5){
+					//se for igual ao waitdistance
+					this.log("ENTREI NO SEGUIR PAREDE-------------------------ESTADO 5");
+					this.segue.setLastDistance(distanceRead);
+					this.currentState = States.Check;
+					break;
+					
+				}else{
+//					this.vaguear.myPause();
+					this.log("ENTREI NO SEGUIR PAREDE-------------------------ESTADO 1");
+					this.segue.setLastDistance(distanceRead);
+					this.currentState = States.Check;
+					break;
+				}
+				
 			default:
 				break;
 				

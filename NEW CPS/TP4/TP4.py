@@ -80,6 +80,12 @@ def EX4A():
     canal = canalAWGN(codePRZ,Pr)
     filtrado = adaptiveFilter(canal,lim,P)
 
+    figure = plt.figure()
+    plt.plot(bits)
+    plt.plot(filtrado)
+    figure.savefig(caminho+"ex4a.png")
+    plt.show()
+
     print("array inicial: " + str(bits))
     print("\n")
     print("array PRZ: " + str(codePRZ))
@@ -95,6 +101,7 @@ def EX4B():
     A = 1
     Pr = [0.5,1,2]
     lim = 0
+    plots = []
 
     for i in range(len(Pr)):
         codePRZ = codigoPRZ(bits,P,A)
@@ -111,7 +118,17 @@ def EX4B():
         print("\n")
         print("array Filtrado: " + str(filtrado))
         print("\n")
+        plots.append(filtrado)
 
+    fig,axs = plt.subplots(3,1)
+    axs[0].plot(plots[0])
+    axs[0].plot(bits)
+    axs[1].plot(plots[1])
+    axs[1].plot(bits)
+    axs[2].plot(plots[2])
+    axs[2].plot(bits)
+    fig.savefig(caminho + "Potencias.png")
+    plt.show()
 
 def EX5():
     P = 8

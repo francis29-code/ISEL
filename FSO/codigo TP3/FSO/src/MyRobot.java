@@ -131,7 +131,7 @@ public class MyRobot {
 	public void SetSensorLowSpeed(int sensorUS){
 		this.sensorUS = sensorUS;
 		if ( this.simulateRobot==false) {
-		      this.robot.SetSensorSound(this.sensorUS);
+		      this.robot.SetSensorLowspeed(this.sensorUS);
 		    }
 		    else {
 		      this.theLogger.log( "SetSensorUS(sensorUS->%d)", this.sensorUS );
