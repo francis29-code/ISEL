@@ -38,11 +38,8 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 	private JButton btnClear;
 	private MyRobot robot;
 	private ThreadKeeper threadContainer;
-	// private RobotLego robot;
 
 	private boolean evitar, gestor, vaguear, segueparede;
-
-	// private Thread evitarT,gestorT,vaguearT,segueparedeT;
 
 	private VaguearT cVaguear;
 	private AvoidObstacleThread cEvitar;
@@ -337,7 +334,7 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 	 */
 	public RobotInterfaceThreads() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 522, 530);
+		setBounds(100, 100, 522, 700);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -525,11 +522,11 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 				}
 			}
 		});
-		chckbxDebug.setBounds(30, 318, 81, 23);
+		chckbxDebug.setBounds(30, 483, 81, 23);
 		contentPane.add(chckbxDebug);
 
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(131, 306, 353, 160);
+		scrollPane.setBounds(131, 306, 353, 310);
 		contentPane.add(scrollPane);
 
 		debugText = new JTextArea();
@@ -542,7 +539,7 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 				clearLog();
 			}
 		});
-		btnClear.setBounds(22, 369, 89, 23);
+		btnClear.setBounds(30, 524, 89, 23);
 		contentPane.add(btnClear);
 
 		chckbxHandler = new JCheckBox("Handler");
@@ -555,7 +552,7 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 				cGestor.updateCheck(gestor);
 			}
 		});
-		chckbxHandler.setBounds(30, 283, 97, 23);
+		chckbxHandler.setBounds(30, 448, 97, 23);
 		contentPane.add(chckbxHandler);
 
 		chckbxEvitar = new JCheckBox("Avoid");
@@ -568,7 +565,7 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 				cEvitar.updateCheck(evitar);
 			}
 		});
-		chckbxEvitar.setBounds(30, 257, 97, 23);
+		chckbxEvitar.setBounds(30, 422, 97, 23);
 		contentPane.add(chckbxEvitar);
 
 		chckbxWander = new JCheckBox("Wander");
@@ -581,7 +578,7 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 				cVaguear.updateCheck(vaguear);
 			}
 		});
-		chckbxWander.setBounds(30, 233, 89, 23);
+		chckbxWander.setBounds(30, 398, 89, 23);
 		contentPane.add(chckbxWander);
 
 		chckbxFollow = new JCheckBox("Follow");
@@ -594,7 +591,7 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 				cSegue.updateCheck(segueparede);
 			}
 		});
-		chckbxFollow.setBounds(30, 211, 81, 23);
+		chckbxFollow.setBounds(30, 376, 81, 23);
 		contentPane.add(chckbxFollow);
 
 		d_ctrlTextfield = new JTextField();

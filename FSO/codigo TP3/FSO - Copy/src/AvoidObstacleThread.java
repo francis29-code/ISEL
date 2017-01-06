@@ -15,7 +15,7 @@ public class AvoidObstacleThread extends Thread implements ILogger {
 
 	private Semaphore acessoRobot, ownSemaphore;
 
-	private boolean contact, checked;
+	private boolean checked;
 
 	private States currentState;
 
@@ -133,7 +133,9 @@ public class AvoidObstacleThread extends Thread implements ILogger {
 		}
 		//menor o sleep mais rapida a resposta 
 		try {
-			Thread.sleep(100);
+			// 1000 ms para robot virtual
+			// 100 para robot fisico
+			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

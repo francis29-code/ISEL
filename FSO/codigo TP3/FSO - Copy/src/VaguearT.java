@@ -25,9 +25,9 @@ public class VaguearT extends Thread implements ILogger {
 
 	protected Random rnd;
 
-	protected MyRobot theRobot;
+	protected MyRobot robot;
 
-	private boolean checked;
+	private boolean checked, isGestor;
 
 	private Semaphore acessoRobot, ownSemaphore;
 
@@ -46,7 +46,7 @@ public class VaguearT extends Thread implements ILogger {
 	public VaguearT(MyRobot robot, Semaphore semaphore) {
 		this.setName("Vaguear");
 		this.currentDirection = Directions.Stop;
-		this.theRobot = robot;
+		this.robot = robot;
 		this.acessoRobot = semaphore;
 		this.currentState = States.Waiting;
 		this.rnd = new Random();
@@ -60,6 +60,14 @@ public class VaguearT extends Thread implements ILogger {
 
 	public boolean isChecked() {
 		return this.checked;
+	}
+	
+	public boolean isGestorChecked(){
+		return this.isGestor;
+	}
+	
+	public void updateGestor(boolean gestor){
+		this.isGestor = gestor;
 	}
 
 	private Directions getNextDirection() {
@@ -127,7 +135,7 @@ public class VaguearT extends Thread implements ILogger {
 				angle = getRandomAngle();
 				sleepTime = getSleepTime(angle, radius);
 				setSleepTime((int) sleepTime);
-				this.theRobot.CurvarDireita((int) radius, (int) angle);
+				this.robot.CurvarDireita((int) radius, (int) angle);
 				this.log("Right(%3.2f, %3.2f)->%3.2f", radius, angle, getCurveDistance(radius, angle));
 				this.acessoRobot.release();
 				break;
@@ -135,7 +143,7 @@ public class VaguearT extends Thread implements ILogger {
 				distance = getRandomDistance();
 				sleepTime = getSleepTime(distance);
 				setSleepTime((int) sleepTime);
-				this.theRobot.Reta((int) distance);
+				this.robot.Reta((int) distance);
 				this.log("Forward(%3.2f)", distance);
 				this.acessoRobot.release();
 				break;
@@ -144,7 +152,7 @@ public class VaguearT extends Thread implements ILogger {
 				angle = getRandomAngle();
 				sleepTime = getSleepTime(angle, radius);
 				setSleepTime((int) sleepTime);
-				this.theRobot.CurvarEsquerda((int) radius, (int) angle);
+				this.robot.CurvarEsquerda((int) radius, (int) angle);
 				this.log("Left(%3.2f, %3.2f)->%3.2f", radius, angle, getCurveDistance(radius, angle));
 				this.acessoRobot.release();
 				break;
@@ -215,7 +223,7 @@ public class VaguearT extends Thread implements ILogger {
 	}
 
 	public void myPause() {
-		this.theRobot.Parar(true);
+		this.robot.Parar(true);
 		this.currentState = States.Waiting;
 	}
 
