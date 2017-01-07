@@ -62,7 +62,7 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 
 	public String log(String message, Object... args) {
 		final String messageDisplay;
-		messageDisplay = "[" + Thread.currentThread().getName() + "]" + String.format(message, args);
+		messageDisplay = "[" + Thread.currentThread().getName() + "] -> " + String.format(message, args);
 		if (this.debugOnOff == false) {
 			return messageDisplay;
 		}
@@ -107,8 +107,8 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 		this.segueparede = false;
 		this.radioState = false;
 		this.debugOnOff = false;
-		
-		//variaveis de controlo dos movimentos
+
+		// variaveis de controlo dos movimentos
 		this.radius = 0;
 		this.angle = 0;
 		this.distance = 0;
@@ -117,10 +117,7 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 		this.distCtrl = 0;
 		this.robotName = "Nome do Robot";
 		// para simulaçoes True, para fisico False
-		// this.robot = new MyRobot(false,this);
-		
-		this.robot = new MyRobot(true, this);
-		// set ao sensor do robot
+		this.robot = new MyRobot(false, this);
 
 		this.rdbtnOnoff.setSelected(this.radioState);
 		this.chckbxDebug.setSelected(this.debugOnOff);
@@ -138,12 +135,11 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 		this.cSegue = new SegueParede(this.robot, this.acessoRobot);
 		this.cSegue.start();
 
-		// this.threadContainer.addThread(this.cVaguear);
-		// this.threadContainer.addThread(this.cEvitar);
-		// this.threadContainer.addThread(this.cSegue);
-
-		// this.cGestor = new GestorThread(this.robot, this.threadContainer);
-		// this.cGestor.start();
+//		this.threadContainer.addThread(this.cVaguear);
+//		this.threadContainer.addThread(this.cSegue);
+//
+//		this.cGestor = new GestorThread(this.robot, this.threadContainer);
+//		this.cGestor.start();
 
 		// SET AOS SENSORES APENAS QUANDO LIGAMOS O ROBOT
 		this.robot.SetTouchSensor(RobotLego.S_2);
@@ -247,9 +243,6 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 		try {
 			this.robot.Reta(this.distance);
 			this.robot.Parar(false);
-			
-			this.log("mensagem de teste");
-			showMessages("distancia lida: " + this.robot.GetSensorUS());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			showMessages("Robot nao disponivel: " + e.getMessage());
@@ -483,6 +476,7 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 				steeringLeft();
 				steeringRight();
 				actionRight();
+				acessoRobot.release();
 				showMessages("Right -> " + distance + "cm.");
 			}
 		});

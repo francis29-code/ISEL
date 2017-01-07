@@ -123,8 +123,8 @@ public class AvoidObstacleThread extends Thread implements ILogger {
 	private void doReading(){
 		if(this.theRobot.GetTouchSensor()){
 			try {
-				this.theRobot.Parar(true);
 				this.acessoRobot.acquire();
+				this.theRobot.Parar(true);
 				this.currentState = States.Running;
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block

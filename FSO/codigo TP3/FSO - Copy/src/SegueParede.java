@@ -65,7 +65,8 @@ public class SegueParede extends Thread implements ILogger {
 			myPause();
 			this.log("MANDEI PARA O WAITING SEGUE");
 		}else{
-			myResume();
+//			myResume();
+			myOwnReading();
 		}
 	}
 	
@@ -90,20 +91,52 @@ public class SegueParede extends Thread implements ILogger {
 		}
 	}
 	
+	private void myOwnReading(){
+		int distance;
+		distance = this.robot.GetSensorUS();
+		this.log("DISTANCIA LIDA: " + distance);
+		if(distance < 100 && distance > 20){
+			this.log("ENTROU NO IF");
+			setCurrentDistance(distance);
+			try {
+				this.acessoRobot.acquire();
+			} catch (InterruptedException e) {
+				
+				e.printStackTrace();
+			}
+			this.log("PASSEI O ACQUIRE");
+			this.currentState = States.Control;
+		}
+		
+		this.log("estado do automato: " + this.currentState);
+	}
+	
 	private void myControl(){
+		this.log("ENTREI NO CONTROLO");
+		this.robot.Reta(this.distCtrl);
+		this.robot.Parar(false);
+		//liberta o robot
+		this.acessoRobot.release();
+		
+		this.log("ESTADO CONTROLO");
+		
+		if(this.lastDistance ==0){
+			this.lastDistance = this.currentDistance;
+			this.currentDistance = 0;
+		}
+		
+		//prints debug
+		this.log("distancia atual : " + this.currentDistance);
+		this.log("distancia antiga : " + this.lastDistance);
+		
 		try {
-			this.acessoRobot.acquire();
+			Thread.sleep((getSleepTime()*1000)+2000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		this.robot.Reta(this.distCtrl);
-		this.robot.Parar(false);
 		
-		//liberta o robot
-		this.acessoRobot.release();
-		this.lastDistance = this.currentDistance;
-		this.currentDistance = 0;
+		setCurrentDistance(this.robot.GetSensorUS());
 		
 		this.currentState = States.Running;
 	}
@@ -115,6 +148,13 @@ public class SegueParede extends Thread implements ILogger {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		//prints debug
+		this.log("ESTADO ACTION");
+		this.log("distancia atual : " + this.currentDistance);
+		this.log("distancia antiga : " + this.lastDistance);
+		
+		
 		double radianos = Math.atan((this.lastDistance-this.currentDistance)/this.distCtrl);
 		double degrees = Math.toDegrees(radianos);
 		if(this.lastDistance < this.currentDistance){
@@ -124,7 +164,7 @@ public class SegueParede extends Thread implements ILogger {
 		}
 		//liberta o robot para um outro comportamento apanhar se indicado
 		this.acessoRobot.release();
-		this.currentState = States.WaitDistance;
+		this.currentState = States.Reading;
 		this.lastDistance = this.currentDistance;
 		this.currentDistance = 0;
 	}
@@ -143,6 +183,8 @@ public class SegueParede extends Thread implements ILogger {
 		while(this.currentState != States.Ending){
 			switch(this.currentState){
 			case Waiting:
+				this.log("ESTU NO WAITING DO SEGUEPAREDE");
+				this.log("ESTADO A PRINTAR " +this.currentState);
 				try{
 					this.ownSemaphore.acquire();
 				}catch(Exception e){
@@ -150,15 +192,23 @@ public class SegueParede extends Thread implements ILogger {
 				}
 				break;
 				
-			case WaitDistance:
-				waitDistance();
+				
+//			case WaitDistance:
+//				waitDistance();
+//				break;
+				
+			case Reading:
+				this.log("ESTADO A PRINTAR " +this.currentState);
+				myOwnReading();
 				break;
 				
 			case Control:
+				this.log("ESTADO A PRINTAR " +this.currentState);
 				myControl();
 				break;
 //				
 			case Running:
+				this.log("ESTADO A PRINTAR " +this.currentState);
 				myAction();
 				break;
 				
