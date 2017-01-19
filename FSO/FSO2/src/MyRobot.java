@@ -1,3 +1,4 @@
+import java.io.FileNotFoundException;
 import java.util.Random;
 
 public class MyRobot {
@@ -11,8 +12,12 @@ public class MyRobot {
   
   private final int SensorMessageTime = 50; // Milliseconds
   
+	private RobotPlayer player;
+
+  
 	private RobotLego robot;
 	
+	boolean record,play,playinv;
 	
 	protected int touchSensor;
 	
@@ -28,6 +33,10 @@ public class MyRobot {
 		this.simulateRobot = simulateRobot;
 		this.rnd = new Random();
 		
+		record = false;
+		play = false;
+		playinv = false;
+		
 		this.theLogger = theLogger;
 		
 		if ( this.simulateRobot==false ) {
@@ -37,8 +46,31 @@ public class MyRobot {
 		else {
 		  this.robot = null;
 		}
+		player = new RobotPlayer(this);
+		player.start();
 		
 	}
+	
+	public void setRecord(boolean r){
+		record = r;
+	}
+	
+	public void setPlay(boolean p){
+		play = p;
+		if(play){
+			player.doPlay();
+		}
+	}
+	
+	public void setPlayInv(boolean p){
+		playinv = p;
+		if(playinv){
+			
+			player.doPlayInv();
+			
+		}
+	}
+	
 	
 	public boolean OpenNXT(String nome) {
 		if ( this.simulateRobot==false) {
@@ -61,36 +93,64 @@ public class MyRobot {
 	public void Parar(boolean b) {
 		if ( this.simulateRobot==false) {
 			this.robot.Parar(b);
+			if (record) {
+				player.recordDirections("parar:"+b);
+			}
 		}
 		else {
 			this.theLogger.log( "Parar(%b)", b );
+			if (record) {
+				player.recordDirections("parar:"+b);
+			}
 		}
 	}
 	
 	public void Reta(int distancia) {
 		if ( this.simulateRobot==false) {
-			this.robot.Reta( distancia );
+			this.robot.Reta( distancia );			
+			if (record) {
+				player.recordDirections("reta:" + distancia);				
+			}
 		}
 		else {
 			this.theLogger.log( "Reta(distancia->%d)", distancia );
+			if (record) {
+				player.recordDirections("reta:" + distancia);	
+			}
 		}
 	}
 	
 	public void CurvarEsquerda(int raio, int angulo) {
 		if ( this.simulateRobot==false) {
 			this.robot.CurvarEsquerda(raio, angulo);
+			if(record){
+				player.recordDirections("curvaresquerda:"+raio+','+angulo);
+				
+			}
 		}
 		else {
 			this.theLogger.log( "CurvarEsquerda(raio->%d, angulo->%d)", raio, angulo );
+			if(record){
+				player.recordDirections("curvaresquerda:"+raio+','+angulo);
+				
+			}
 		}
 	}
 	
 	public void CurvarDireita(int raio, int angulo) {
 		if ( this.simulateRobot==false) {
 			this.robot.CurvarDireita(raio, angulo);
+			if(record){
+				player.recordDirections("curvardireita:"+raio+','+angulo);
+				
+			}
 		}
 		else {
 			this.theLogger.log( "CurvarDireita(raio->%d, angulo->%d)", raio, angulo );
+			if(record){
+				player.recordDirections("curvardireita:"+raio+','+angulo);
+				
+			}
 		}
 	}
 	
@@ -169,6 +229,10 @@ public class MyRobot {
 	  else {
 	    return 0;
 	  }
+	}
+	
+	public void stopRecord(){
+		player.doStop();
 	}
 	
 	
