@@ -187,7 +187,7 @@ def EX5():
 
 if __name__ == "__main__":
     # EX4A()
-    # EX4B()
-    EX5()
+    EX4B()
+    # EX5()
 
 print("--- %s seconds ---" % (time.time() - start_time))
