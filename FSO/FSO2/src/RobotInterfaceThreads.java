@@ -1,13 +1,18 @@
 
 import java.awt.Color;
 import java.awt.EventQueue;
-import java.awt.TextArea;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.Scanner;
 import java.util.concurrent.Semaphore;
 
@@ -51,17 +56,18 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 	private AvoidObstacleThread cEvitar;
 	private GestorThread cGestor;
 	private SegueParede cSegue;
+	private GUIplayer player;
 
 	private Semaphore acessoRobot;
-	private PrintWriter writerDir;
+	Writer writerDir = null;
 
 
 	private String robotName;
+	private String url;
 	private boolean radioState;
 	private boolean debugOnOff;
-	private  boolean record;
-	private boolean play;
-	private boolean playinv;
+	private boolean playerinit;
+
 	private int rightOffsetValue;
 	private int leftOffsetValue;
 	private int distCtrl;
@@ -118,9 +124,8 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 		this.segueparede = false;
 		this.radioState = false;
 		this.debugOnOff = false;
-		this.record = false;
-		this.play = false;
-		this.playinv = false;
+		this.playerinit = false;
+
 
 		// variaveis de controlo dos movimentos
 		this.radius = 0;
@@ -130,8 +135,11 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 		this.leftOffsetValue = 0;
 		this.distCtrl = 0;
 		this.robotName = "Nome do Robot";
+		this.url = "C:\\Users\\Diogo Fernandes\\workspace\\FSO2\\configurations\\";
+		
 		// para simulaçoes True, para fisico False
-		this.robot = new MyRobot(false, this);
+		this.robot = new MyRobot(true, this);
+		this.player = null;
 
 		this.rdbtnOnoff.setSelected(this.radioState);
 		this.chckbxDebug.setSelected(this.debugOnOff);
@@ -161,19 +169,28 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 		showMessages(this.log("lançou threads"));
 	}
 
-	public void recordConfig() throws FileNotFoundException, UnsupportedEncodingException{
-		File file = new File("config"+robotName+".txt");
-		writerDir= new PrintWriter(file);
-		writerDir.write("robotname:"+robotName);
-		writerDir.write("steeringleft:"+leftOffsetValue);
-		writerDir.write("steeringright:"+rightOffsetValue);
-		writerDir.write("distCtrl:"+distCtrl);
-		writerDir.write("debugbool:"+debugOnOff);
+	public void recordConfig() throws IOException{
+		 
+		 File file = new File(url+"config"+robotName+".txt");
+		try {
+		    writerDir = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
+		
+		} catch (IOException ex) {
+		  // report
+		}
+
+		writerDir.write("steeringleft:"+leftOffsetValue + "\n");
+		writerDir.write("steeringright:"+rightOffsetValue + "\n");
+		writerDir.write("distCtrl:"+distCtrl + "\n");
+		writerDir.write("debugbool:"+debugOnOff + "\n");
+		writerDir.write("distance:"+distance + "\n");
+		writerDir.write("angle:"+angle + "\n");
+		writerDir.write("radius:"+radius + "\n");
 		writerDir.close();
 	}
 	
 	public void loadConfig(String robotName) throws FileNotFoundException{
-		File file = new File("config"+robotName+".txt");
+		File file = new File(url+"config"+robotName+".txt");
 		if(file.exists()){
 			Scanner sc = new Scanner(file);
 			String theString = sc.nextLine();
@@ -181,23 +198,47 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 				theString = theString + "\n" + sc.nextLine();
 			}
 			String[] aux = theString.split("\n");
+			for(int x = 0; x < aux.length; x++){
+				System.out.println("array de string. "+aux[x]);
+				
+			}
+			System.out.println("lenght do array: " + aux.length);
 			for(int i = 0; i < aux.length; i++){
 				if(aux[i].contains("steeringleft")){
 					String x = aux[i].substring(aux[i].indexOf(':') + 1);
+					setLeftOffset(x);
 					leftOffset.setText(x);
 				}
 				if(aux[i].contains("steeringright")){
 					String x = aux[i].substring(aux[i].indexOf(':') + 1);
+					setRightOffset(x);
 					rightOffset.setText(x);
 				}
 				if(aux[i].contains("distCtrl")){
 					String x = aux[i].substring(aux[i].indexOf(':') + 1);
 					setDistCtrl(x);
+					d_ctrlTextfield.setText(x);
 				}
 				if(aux[i].contains("debugbool")){
 					String x = aux[i].substring(aux[i].indexOf(':') + 1);
 					boolean y = Boolean.parseBoolean(x);
-					debugOnOff= y;		
+					debugOnOff= y;	
+					chckbxDebug.setSelected(y);
+				}
+				if(aux[i].contains("distance")){
+					String x = aux[i].substring(aux[i].indexOf(':') + 1);
+					setDistance(x);
+					distanceText.setText(x);
+				}
+				if(aux[i].contains("angle")){
+					String x = aux[i].substring(aux[i].indexOf(':') + 1);
+					setAngle(x);
+					angleText.setText(x);
+				}
+				if(aux[i].contains("radius")){
+					String x = aux[i].substring(aux[i].indexOf(':') + 1);
+					setRadius(x);
+					radiusText.setText(x);
 				}
 				
 			}
@@ -302,7 +343,7 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 	private void actionForward() {
 		// TODO Auto-generated method stub
 		try {
-			this.robot.Reta(this.distance);
+			this.robot.Reta(this.distance,false);
 			this.robot.Parar(false);
 			
 		} catch (Exception e) {
@@ -313,7 +354,7 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 
 	private void actionBackwards() {
 		try {
-			this.robot.Reta(-this.distance);
+			this.robot.Reta(-this.distance,false);
 			this.robot.Parar(false);
 		
 		} catch (Exception e) {
@@ -323,7 +364,7 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 
 	private void actionRight() {
 		try {
-			this.robot.CurvarDireita(this.radius, this.angle);
+			this.robot.CurvarDireita(this.radius, this.angle,false);
 			this.robot.Parar(false);
 			
 		} catch (Exception e) {
@@ -335,7 +376,7 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 		//
 		// this.cVaguear.myWait();
 		try {
-			this.robot.CurvarEsquerda(this.radius, this.angle);
+			this.robot.CurvarEsquerda(this.radius, this.angle,false);
 			this.robot.Parar(false);
 			
 		} catch (Exception e) {
@@ -433,6 +474,12 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 			public void actionPerformed(ActionEvent e) {
 				setRobotName(robotNameText.getText());
 				showMessages("Nome do robot -> " + robotName);
+				try {
+					loadConfig(robotName);
+				} catch (FileNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				
 			}
 		});
@@ -676,68 +723,33 @@ public class RobotInterfaceThreads extends JFrame implements ILogger {
 		lblCm_2.setBounds(98, 108, 46, 14);
 		contentPane.add(lblCm_2);
 		
-		JLabel lblPlayer = new JLabel("Player");
-		lblPlayer.setBounds(30, 173, 46, 14);
-		contentPane.add(lblPlayer);
-		
-		JButton btnRecord = new JButton("Record");
-		btnRecord.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(!record){
-					record = !record;
-					robot.setRecord(record);
-				}
-			}
-		});
-		btnRecord.setBounds(10, 198, 78, 23);
-		contentPane.add(btnRecord);
-		
-		JButton btnPlay = new JButton("Play");
-		btnPlay.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(!play){
-					play = !play;
-					robot.setPlay(play);
-					
-				}
-			}
-		});
-		btnPlay.setBounds(10, 220, 78, 23);
-		contentPane.add(btnPlay);
-		
-		JButton btnPlayinv = new JButton("PlayInv");
-		btnPlayinv.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(!playinv){
-					playinv = !playinv;
-					robot.setPlayInv(playinv);
-				}
-			}
-		});
-		btnPlayinv.setBounds(10, 244, 78, 23);
-		contentPane.add(btnPlayinv);
-		
-		JButton btnStopPlayer = new JButton("Stop");
-		btnStopPlayer.addActionListener(new ActionListener() {
+		JButton btnInitPlayer = new JButton("Init Player");
+		btnInitPlayer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(record){
-					record = !record;
-					robot.setRecord(record);
-					robot.stopRecord();
-				}
-				if(play){
-					play = !play;
-					robot.setPlay(play);
-				}
-				if(playinv){
-					playinv = !playinv;
-					robot.setPlayInv(playinv);
+				playerinit = !playerinit;
+				if(playerinit){
+					player = new GUIplayer(robot);
+					player.setVisible(true);
 				}
 				
 			}
 		});
-		btnStopPlayer.setBounds(10, 266, 78, 23);
-		contentPane.add(btnStopPlayer);
+		btnInitPlayer.setBounds(10, 198, 134, 23);
+		contentPane.add(btnInitPlayer);
+		
+		JButton btnRecordConfig = new JButton("Record Config");
+		btnRecordConfig.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					recordConfig();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+		btnRecordConfig.setBounds(10, 164, 134, 23);
+		contentPane.add(btnRecordConfig);
 
 		this.setVisible(true);
 

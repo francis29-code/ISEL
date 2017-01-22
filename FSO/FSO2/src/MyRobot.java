@@ -1,4 +1,4 @@
-import java.io.FileNotFoundException;
+
 import java.util.Random;
 
 public class MyRobot {
@@ -65,9 +65,7 @@ public class MyRobot {
 	public void setPlayInv(boolean p){
 		playinv = p;
 		if(playinv){
-			
 			player.doPlayInv();
-			
 		}
 	}
 	
@@ -105,49 +103,50 @@ public class MyRobot {
 		}
 	}
 	
-	public void Reta(int distancia) {
+	public void Reta(int distancia, boolean chkavoid) {
 		if ( this.simulateRobot==false) {
-			this.robot.Reta( distancia );			
-			if (record) {
+			this.robot.Reta( distancia );	
+			
+			if (!chkavoid && record) {
 				player.recordDirections("reta:" + distancia);				
 			}
 		}
 		else {
 			this.theLogger.log( "Reta(distancia->%d)", distancia );
-			if (record) {
+			if (!chkavoid && record) {
 				player.recordDirections("reta:" + distancia);	
 			}
 		}
 	}
 	
-	public void CurvarEsquerda(int raio, int angulo) {
+	public void CurvarEsquerda(int raio, int angulo, boolean chkavoid) {
 		if ( this.simulateRobot==false) {
 			this.robot.CurvarEsquerda(raio, angulo);
-			if(record){
+			if(!chkavoid && record){
 				player.recordDirections("curvaresquerda:"+raio+','+angulo);
 				
 			}
 		}
 		else {
 			this.theLogger.log( "CurvarEsquerda(raio->%d, angulo->%d)", raio, angulo );
-			if(record){
+			if(!chkavoid && record){
 				player.recordDirections("curvaresquerda:"+raio+','+angulo);
 				
 			}
 		}
 	}
 	
-	public void CurvarDireita(int raio, int angulo) {
+	public void CurvarDireita(int raio, int angulo, boolean chkavoid) {
 		if ( this.simulateRobot==false) {
 			this.robot.CurvarDireita(raio, angulo);
-			if(record){
+			if(!chkavoid && record){
 				player.recordDirections("curvardireita:"+raio+','+angulo);
 				
 			}
 		}
 		else {
 			this.theLogger.log( "CurvarDireita(raio->%d, angulo->%d)", raio, angulo );
-			if(record){
+			if(!chkavoid && record){
 				player.recordDirections("curvardireita:"+raio+','+angulo);
 				
 			}

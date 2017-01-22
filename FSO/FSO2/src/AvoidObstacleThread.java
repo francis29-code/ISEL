@@ -94,14 +94,14 @@ public class AvoidObstacleThread extends Thread implements ILogger {
 	}
 	
 	private void doAvoid(){
-		this.theRobot.Reta(-MAX_DISTANCE);
+		this.theRobot.Reta(-MAX_DISTANCE,true);
 		try {
 			Thread.sleep((int)(getSleepTime(MAX_DISTANCE)*1000));
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		this.theRobot.CurvarEsquerda(MAX_RADIUS, MAX_ANGLE);
+		this.theRobot.CurvarEsquerda(MAX_RADIUS, MAX_ANGLE,true);
 		try {
 			Thread.sleep((int)(getSleepTime(MAX_ANGLE, MAX_RADIUS)*1000));
 		} catch (InterruptedException e) {

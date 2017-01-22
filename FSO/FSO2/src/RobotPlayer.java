@@ -4,9 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class RobotPlayer extends Thread implements ILogger{
@@ -19,6 +18,8 @@ public class RobotPlayer extends Thread implements ILogger{
 	String url;
 	estados estado;
 	
+	ArrayList<String> playinv;
+	
 	public enum estados{
 		waiting,Play,PlayInverse,Stop,ending;
 	}
@@ -29,7 +30,7 @@ public class RobotPlayer extends Thread implements ILogger{
 		this.robot = robot;
 		url = "C:\\Users\\Diogo Fernandes\\workspace\\FSO2\\directions\\";
 		file = new File(url+"directions.txt");
-		
+		playinv = new ArrayList<>();
 //		try {
 //			writerDir= new PrintWriter(file);
 //		} catch (FileNotFoundException e) {
@@ -75,6 +76,7 @@ public class RobotPlayer extends Thread implements ILogger{
 		
 		while (sc.hasNextLine()) {
 			theString = theString + "\n" + sc.nextLine();
+			
 		}
 		String[] aux = theString.split("\n");
 		for(int i = 0; i < aux.length; i++){
@@ -82,7 +84,7 @@ public class RobotPlayer extends Thread implements ILogger{
 				String x = aux[i].substring(aux[i].indexOf(':') + 1);
 				int y = Integer.parseInt(x);
 				log("reta: "+y);
-				robot.Reta(y);
+				robot.Reta(y,false);
 				
 				
 			}
@@ -92,7 +94,7 @@ public class RobotPlayer extends Thread implements ILogger{
 				int r = Integer.parseInt(raio);
 				int a = Integer.parseInt(angulo);
 				log("curvardireita: raio ="+r+" angulo ="+a);
-				robot.CurvarDireita(r, a);
+				robot.CurvarDireita(r, a,false);
 				
 			}
 			if(aux[i].contains("curvaresquerda")){
@@ -101,7 +103,7 @@ public class RobotPlayer extends Thread implements ILogger{
 				int r = Integer.parseInt(raio);
 				int a = Integer.parseInt(angulo);
 				log("curvaresquerda: raio ="+r+" angulo ="+a);
-				robot.CurvarEsquerda(r, a);
+				robot.CurvarEsquerda(r, a,false);
 				
 			}
 			if(aux[i].contains("parar")){
@@ -121,8 +123,60 @@ public class RobotPlayer extends Thread implements ILogger{
 		sc.close();
 	}
 	
-	public void playInverse(){
+	public void playInverse() throws FileNotFoundException{
+		Scanner sc= new Scanner(file);
+		String theString = sc.nextLine();
 		
+		while (sc.hasNextLine()) {
+			theString = theString + "\n" + sc.nextLine();
+			
+		}
+		String[] aux = theString.split("\n");
+		for(int i = aux.length-1; i > -1; i--){
+			if(aux[i].contains("reta")){
+				String x = aux[i].substring(aux[i].indexOf(':') + 1);
+				int y = Integer.parseInt(x);
+				log("reta: "+y);
+				robot.Reta(-y,false);
+				
+				
+			}
+			if(aux[i].contains("curvardireita")){
+				String raio = aux[i].substring(aux[i].indexOf(':') + 1, aux[i].indexOf(','));
+				String angulo = aux[i].substring(aux[i].indexOf(',') + 1);
+				int r = Integer.parseInt(raio);
+				int a = Integer.parseInt(angulo);
+				log("curvardireita: raio ="+r+" angulo ="+a);
+				robot.CurvarEsquerda(r, a,false);
+				
+			}
+			if(aux[i].contains("curvaresquerda")){
+				String raio = aux[i].substring(aux[i].indexOf(':') + 1, aux[i].indexOf(','));
+				String angulo = aux[i].substring(aux[i].indexOf(',') + 1);
+				int r = Integer.parseInt(raio);
+				int a = Integer.parseInt(angulo);
+				log("curvaresquerda: raio ="+r+" angulo ="+a);
+				robot.CurvarDireita(r, a,false);
+				
+			}
+			if(aux[i].contains("parar")){
+				String y = aux[i].substring(aux[i].indexOf(':') + 1);
+				boolean x = Boolean.parseBoolean(y);
+				log("STOP: "+x);
+				robot.Parar(x);
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			System.out.println("valor de i: "+i);
+			
+		}
+		this.robot.Parar(false);
+		
+		sc.close();
 	}
 	
 	public void stopPlayer(){
@@ -150,7 +204,7 @@ public class RobotPlayer extends Thread implements ILogger{
 		while(estado != estados.ending){
 			switch (estado) {
 			case waiting:
-				log("Case: waiting");
+				//log("Case: waiting");
 				break;
 			case Play:
 				log("Case: Play");
@@ -160,14 +214,22 @@ public class RobotPlayer extends Thread implements ILogger{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				estado = estados.waiting;
 				break;
 			case PlayInverse:
 				log("Case: PlayInverse");
-				playInverse();
+				try {
+					playInverse();
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				estado = estados.waiting;
 				break;
 			case Stop:
 				log("Case: Stop");
 				stopPlayer();
+				estado = estados.waiting;
 				break;
 			default:
 				break;
