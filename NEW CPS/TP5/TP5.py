@@ -6,19 +6,19 @@ from scipy.special import erfc
 import sys
 import pylab as pylab
 import time
-# from TP2e3 import createTable
-# from TP2e3 import quantificacao
-# from TP2e3 import codificaSinal
-# from TP2e3 import SNRTeorico
-# from TP2e3 import SNRPratico
-# from TP2e3 import potenciaErroQuant
-# from TP2e3 import erroQuantificacao
-# from TP2e3 import potenciaSinal
-# from TP2e3 import descodificaSinal
-# from TP2e3 import quantificacaoInversa
-# from TP2e3 import recordSignal
-# from TP3 import hamming
-# from TP3 import sindrome
+from TP2e3 import createTable
+from TP2e3 import quantificacao
+from TP2e3 import codificaSinal
+from TP2e3 import SNRTeorico
+from TP2e3 import SNRPratico
+from TP2e3 import potenciaErroQuant
+from TP2e3 import erroQuantificacao
+from TP2e3 import potenciaSinal
+from TP2e3 import descodificaSinal
+from TP2e3 import quantificacaoInversa
+from TP2e3 import recordSignal
+from TP3 import hamming
+from TP3 import sindrome
 
 start_time = time.time()
 
@@ -72,6 +72,7 @@ def QPSK(arrayBits,P,Eb):
     # plt.grid(True)
     # plt.show()
 
+
     ###############################################################
 
     return secondArray
@@ -99,6 +100,7 @@ def desmodulacao(arrayQPSK,P):
             calculoY = -np.sqrt(2*Rs)*np.sin((2*np.pi*j)/P)*current[j]
             calculoX = np.sqrt(2*Rs)*np.cos((2*np.pi*j)/P)*current[j]
             plt.plot(calculoX,calculoY,'o')
+            # plt.plot(calculoY,calculoX,'o')
             finalArrayY[j] = calculoY
             finalArrayX[j] = calculoX
 
@@ -132,13 +134,19 @@ def canalAWGN(signal,noisePower):
     signalOut = signal + np.sqrt(noisePower)*np.random.randn(len(signal))
     return signalOut
 
-
-
 if __name__ == "__main__":
-    P=8
+    P=400
+    R=3
+
+    # fsRecord, data = wav.read(caminho + 'sinaldevoz8khz.wav')
+    # VD,NQ = createTable(R,np.max(np.abs(data)))
+    # #quantificacao do sinal lido
+    # SQ, IQ = quantificacao(data,NQ,VD)
+    # #codificacao do sinal quantificado
+    # signalCodif = codificaSinal(IQ,R)
+    # # #adicao dos bits de erro
+    # signalControl = hamming(signalCodif)
+    #####################
     array = QPSK(teste,P,1)
-    # print(str(array))
     arrayCanal = canalAWGN(array,0.5)
     arrayD = desmodulacao(arrayCanal,P)
-
-    print("ARRAY FINAL: " + str(arrayD))

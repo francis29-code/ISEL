@@ -33,7 +33,6 @@ public class GestorThread extends Thread implements ILogger{
 		this.threadContainer = lista;
 		this.currentState = States.Init;
 		this.vaguear = (VaguearT) this.threadContainer.getThread("Vaguear");
-//		this.evitar = (AvoidObstacleThread) this.threadContainer.getThread("Evitar");
 		this.segue = (SegueParede) this.threadContainer.getThread("Segue");
 		this.readDistance = 0;
 		this.robot = robot;
@@ -86,6 +85,12 @@ public class GestorThread extends Thread implements ILogger{
 				}else{
 					this.currentState = States.Vaguear;
 				}
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				break;
 				
 				
@@ -93,7 +98,7 @@ public class GestorThread extends Thread implements ILogger{
 				//comunica distancia lida para o comportamento segue parede
 				//quando manda andar, tem de espera o tempo suficiente para voltar a ler o sensor.
 				try {
-					this.segue.setCurrentDistance(readDistance);
+//					this.segue.setCurrentDistance(readDistance);
 					Thread.sleep(this.segue.getSleepTime()*1000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -117,7 +122,9 @@ public class GestorThread extends Thread implements ILogger{
 				}
 				break;
 				
+			case Waiting:
 				
+				break;
 			default:
 				break;
 			}

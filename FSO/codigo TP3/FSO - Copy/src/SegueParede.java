@@ -1,18 +1,22 @@
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.concurrent.Semaphore;
 
 public class SegueParede extends Thread implements ILogger {
-	
+
 	private int distCtrl;
 
 	private MyRobot robot;
-	
+
 	private Semaphore acessoRobot, ownSemaphore;
-	
-	private int lastDistance, currentDistance, currentSleep;
+
+	private int oldDistance, newDistance, currentSleep, auxDistance;
 
 	private States currentState;
-	
+
 	private boolean checked;
+
+	private int distances[];
 
 	@Override
 	public String log(String message, Object... args) {
@@ -28,190 +32,231 @@ public class SegueParede extends Thread implements ILogger {
 		this.setName("Segue");
 		this.robot = robot;
 		this.acessoRobot = semaphore;
-		this.lastDistance = 0;
-		this.currentDistance = 0;
+		this.oldDistance = 0;
+		this.newDistance = 0;
 		this.distCtrl = 0;
 		this.currentSleep = 0;
+		this.auxDistance = 0;
 		this.checked = false;
 		this.currentState = States.Waiting;
 		this.ownSemaphore = new Semaphore(0);
+		this.distances = new int[5];
 	}
-	
-	
-	public void myPause(){
+
+	public void myPause() {
 		this.currentState = States.Waiting;
 		this.robot.Parar(true);
 	}
-	
-	
+
 	public void setControlDist(int distance) {
 		// TODO Auto-generated method stub
 		this.distCtrl = distance;
 		setSleepTime(distance);
 	}
-	
-	private void setSleepTime(int distance){
-		//distancia de controlo como parametro
-		this.currentSleep = distance*5/100;
+
+	private void setSleepTime(int distance) {
+		// distancia de controlo como parametro
+		this.currentSleep = distance * 5 / 100;
 	}
-	
-	public int getSleepTime(){
+
+	public int getSleepTime() {
 		return this.currentSleep;
 	}
-	
-	public void updateCheck(boolean check){
+
+	public int getMidleValue() {
+		return this.distances[distances.length / 2];
+	}
+
+	public void updateCheck(boolean check) {
 		this.checked = check;
-		if(!this.checked){
+		if (!this.checked) {
 			myPause();
-			this.log("MANDEI PARA O WAITING SEGUE");
-		}else{
-//			myResume();
-			myOwnReading();
+		} else {
+			myResume();
 		}
 	}
-	
-	public void setCurrentDistance(int distanceRead){
-		this.currentDistance = distanceRead;
+
+	public void setNewDistance(int distanceRead) {
+		this.oldDistance = this.newDistance;
+		this.newDistance = distanceRead;
 	}
-	
-	public void myResume(){
+
+	public void myResume() {
 		this.ownSemaphore.release();
-		this.currentState = States.WaitDistance;
+		this.currentState = States.Reading;
 	}
-	
-	private void waitDistance(){
-		if(this.currentDistance != 0){
+
+	private double getCurveDistance(double angle, double radius) {
+		double perimeter = 2.0 * Math.PI * radius;
+		return angle * perimeter / 360.0;
+	}
+
+	private double getSleepTime(double distance) {
+		double sleepTime;
+		sleepTime = distance * 5.0 / 100.0;
+
+		this.log("getSleepTime(%3.2f)->%3.2f", distance, sleepTime);
+
+		return sleepTime;
+	}
+
+	private double getSleepTime(double angle, double radius) {
+		return getSleepTime(getCurveDistance(angle, radius));
+	}
+
+	// private void addDistanceArray(int distance) {
+	// for (int i = distances.length - 1; i < 0; i++) {
+	// distances[i] = distances[i - 1];
+	// }
+	// distances[0] = distance;
+	// }
+
+	private void myAction() {
+		double radAngle = ((double) this.oldDistance - (double) this.newDistance) / (double) this.distCtrl;
+		double radianos = Math.atan(radAngle);
+		double degrees = (radianos * 360) / (2 * Math.PI);
+
+		this.log("--------------------------------- angulo calculado: " + degrees);
+		if (degrees > 3 || degrees < -3) {
+			if (this.oldDistance > this.newDistance) {
+				this.robot.CurvarEsquerda(0, (int) degrees);
+				this.robot.Parar(false);
+				try {
+					Thread.sleep((int) getSleepTime((int) degrees, 0) * 1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else {
+				this.robot.CurvarDireita(0, (int) degrees);
+				this.robot.Parar(false);
+				try {
+					Thread.sleep((int) getSleepTime((int) degrees, 0) * 1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			this.acessoRobot.release();
+			if (this.currentState != States.Waiting) {
+				this.currentState = States.ReadingV2;
+			}
+
+		} else {
+			if (this.currentState != States.Waiting) {
+				this.currentState = States.Control;
+			}
+		}
+	}
+
+	private void myReading() {
+		auxDistance = this.robot.GetSensorUS();
+		this.log("LI Primeira DISTANCIA: " + auxDistance + " esperar 3 segundos");
+
+		if (auxDistance < 100 && auxDistance > 20) {
 			try {
 				this.acessoRobot.acquire();
-				this.currentState = States.Control;
+				setNewDistance(auxDistance);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			if (this.currentState != States.Waiting) {
+				this.currentState = States.Control;
+			}
+
+		} else {
+			if (this.currentState != States.Waiting) {
+				this.currentState = States.Reading;
+			}
+
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
 	}
-	
-	private void myOwnReading(){
-		int distance;
-		distance = this.robot.GetSensorUS();
-		this.log("DISTANCIA LIDA: " + distance);
-		if(distance < 100 && distance > 20){
-			this.log("ENTROU NO IF");
-			setCurrentDistance(distance);
+
+	private void myControl() {
+		this.robot.Reta(distCtrl);
+		this.robot.Parar(false);
+		this.acessoRobot.release();
+		try {
+			Thread.sleep(getSleepTime() * 1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (this.currentState != States.Waiting) {
+			this.currentState = States.ReadingV2;
+		}
+
+	}
+
+	private void myReadingV2() {
+		auxDistance = this.robot.GetSensorUS();
+		this.log("LI Segunda DISTANCIA: " + auxDistance + " esperar 3 segundos");
+
+		if (auxDistance < 100 && auxDistance > 20) {
 			try {
 				this.acessoRobot.acquire();
+				setNewDistance(auxDistance);
 			} catch (InterruptedException e) {
-				
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			this.log("PASSEI O ACQUIRE");
-			this.currentState = States.Control;
+			if (this.currentState != States.Waiting) {
+				this.currentState = States.Turn;
+
+			}
+		} else {
+			if (this.currentState != States.Waiting) {
+				this.currentState = States.ReadingV2;
+			}
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
-		
-		this.log("estado do automato: " + this.currentState);
 	}
-	
-	private void myControl(){
-		this.log("ENTREI NO CONTROLO");
-		this.robot.Reta(this.distCtrl);
-		this.robot.Parar(false);
-		//liberta o robot
-		this.acessoRobot.release();
-		
-		this.log("ESTADO CONTROLO");
-		
-		if(this.lastDistance ==0){
-			this.lastDistance = this.currentDistance;
-			this.currentDistance = 0;
-		}
-		
-		//prints debug
-		this.log("distancia atual : " + this.currentDistance);
-		this.log("distancia antiga : " + this.lastDistance);
-		
-		try {
-			Thread.sleep((getSleepTime()*1000)+2000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		setCurrentDistance(this.robot.GetSensorUS());
-		
-		this.currentState = States.Running;
-	}
-	
-	private void myAction(){
-		try {
-			this.acessoRobot.acquire();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		//prints debug
-		this.log("ESTADO ACTION");
-		this.log("distancia atual : " + this.currentDistance);
-		this.log("distancia antiga : " + this.lastDistance);
-		
-		
-		double radianos = Math.atan((this.lastDistance-this.currentDistance)/this.distCtrl);
-		double degrees = Math.toDegrees(radianos);
-		if(this.lastDistance < this.currentDistance){
-			this.robot.CurvarDireita(0, (int)degrees);
-		}else{
-			this.robot.CurvarEsquerda(0, (int)degrees);
-		}
-		//liberta o robot para um outro comportamento apanhar se indicado
-		this.acessoRobot.release();
-		this.currentState = States.Reading;
-		this.lastDistance = this.currentDistance;
-		this.currentDistance = 0;
-	}
-	
-	public States currentState(){
-		return this.currentState;
-	}
-	
-	public void readingDistance(){
-		this.log("DISTANCE READ: " + this.robot.GetSensorUS());
-	}
-	
-	
+
 	@Override
 	public void run() {
-		while(this.currentState != States.Ending){
-			switch(this.currentState){
+		while (this.currentState != States.Ending) {
+			switch (this.currentState) {
 			case Waiting:
-				this.log("ESTU NO WAITING DO SEGUEPAREDE");
-				this.log("ESTADO A PRINTAR " +this.currentState);
-				try{
+				this.log("ESTOU NO WAITING DO SEGUEPAREDE");
+				this.log("ESTADO A PRINTAR " + this.currentState);
+				try {
 					this.ownSemaphore.acquire();
-				}catch(Exception e){
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 				break;
-				
-				
-//			case WaitDistance:
-//				waitDistance();
-//				break;
-				
+
 			case Reading:
-				this.log("ESTADO A PRINTAR " +this.currentState);
-				myOwnReading();
+				this.log("ESTADO A PRINTAR " + this.currentState);
+				myReading();
 				break;
-				
+
 			case Control:
-				this.log("ESTADO A PRINTAR " +this.currentState);
+				this.log("ESTADO A PRINTAR " + this.currentState);
 				myControl();
 				break;
-//				
-			case Running:
-				this.log("ESTADO A PRINTAR " +this.currentState);
+			//
+			case ReadingV2:
+				this.log("ESTADO A PRINTAR " + this.currentState);
+				myReadingV2();
+				break;
+
+			case Turn:
+				this.log("ESTADO A PRINTAR " + this.currentState);
 				myAction();
 				break;
-				
 
 			default:
 				break;

@@ -1,17 +1,19 @@
+import java.util.ArrayList;
 import java.util.concurrent.Semaphore;
 
 public class CaixaCorreio {
 	final int dimensaoBuffer = 2;
-	String[] bufferCircular;
-	int putBuffer, getBuffer;
+	private ArrayList<Integer> bufferCircular;
+	private int putBuffer, getBuffer;
 	// o semáforo elementosLivres indica se há posições livres para inserir
 	// Strings
 	// o semáforo acessoElemento garante exclusão mútua no acesso a um elemento
 	// o semáforo elementosOcupados indica se há posições com Strings válidas
-	Semaphore elementosLivres, acessoElemento, elementosOcupados;
+	private Semaphore elementosLivres, acessoElemento, elementosOcupados;
 
 	public CaixaCorreio() {
-		bufferCircular = new String[dimensaoBuffer];
+		//arraylist ou estatico, opcional
+		bufferCircular = new ArrayList<Integer>();
 		putBuffer = 0;
 		getBuffer = 0;
 		elementosLivres = new Semaphore(dimensaoBuffer);
@@ -19,11 +21,11 @@ public class CaixaCorreio {
 		acessoElemento = new Semaphore(1);
 	}
 
-	public void inserirElemento(String s) {
+	public void inserirElemento(int distancia) {
 		try {
 			elementosLivres.acquire();
 			acessoElemento.acquire();
-			bufferCircular[putBuffer] = new String(s);
+			bufferCircular.add(putBuffer,distancia);
 			putBuffer = ++putBuffer % dimensaoBuffer;
 			acessoElemento.release();
 		} catch (InterruptedException e) {
@@ -31,14 +33,14 @@ public class CaixaCorreio {
 		elementosOcupados.release();
 	}
 
-	public String removerElemento() {
-		String s = new String();
+	public int removerElemento() {
+		int s = new Integer(0);
 		try {
 			elementosOcupados.acquire();
 			acessoElemento.acquire();
 		} catch (InterruptedException e) {
 		}
-		s = bufferCircular[getBuffer];
+		s = bufferCircular.get(getBuffer);
 		getBuffer = ++getBuffer % dimensaoBuffer;
 		acessoElemento.release();
 		elementosLivres.release();

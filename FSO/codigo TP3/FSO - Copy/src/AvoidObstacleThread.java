@@ -6,7 +6,7 @@ public class AvoidObstacleThread extends Thread implements ILogger {
 	final static int MAX_ANGLE = 90;
 
 	final static int MAX_RADIUS = 0;
-	
+
 	final static int SLEEP_TIME_SENSOR = 1000;
 
 	protected String robotName;
@@ -38,14 +38,13 @@ public class AvoidObstacleThread extends Thread implements ILogger {
 		this.checked = false;
 	}
 
-
 	@Override
 	public void run() {
-		while(this.currentState != States.Ending){
-			switch(this.currentState){
+		while (this.currentState != States.Ending) {
+			switch (this.currentState) {
 			case Waiting:
 				this.log("ESTOU NO WAITING EVITAR");
-				//estado à espera de uma alteração
+				// estado à espera de uma alteração
 				try {
 					Thread.sleep(SLEEP_TIME_SENSOR);
 					this.ownSemaphore.acquire();
@@ -53,14 +52,14 @@ public class AvoidObstacleThread extends Thread implements ILogger {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-		
+
 				break;
-				
+
 			case Reading:
 				this.log("ESTOU NO READING EVITAR");
 				doReading();
 				break;
-				
+
 			case Running:
 				this.log("ESTOU NO RUNNING EVITAR");
 				doAvoid();
@@ -70,7 +69,7 @@ public class AvoidObstacleThread extends Thread implements ILogger {
 			}
 		}
 	}
-	
+
 	private double getCurveDistance(double angle, double radius) {
 		double perimeter = 2.0 * Math.PI * radius;
 		return angle * perimeter / 360.0;
@@ -88,80 +87,83 @@ public class AvoidObstacleThread extends Thread implements ILogger {
 	private double getSleepTime(double angle, double radius) {
 		return getSleepTime(getCurveDistance(angle, radius));
 	}
-	
-	public States currentState(){
+
+	public States currentState() {
 		return this.currentState;
 	}
-	
-	private void doAvoid(){
+
+	private void doAvoid() {
 		this.theRobot.Reta(-MAX_DISTANCE);
 		try {
-			Thread.sleep((int)(getSleepTime(MAX_DISTANCE)*1000));
+			Thread.sleep((int) (getSleepTime(MAX_DISTANCE) * 1000));
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		this.theRobot.CurvarEsquerda(MAX_RADIUS, MAX_ANGLE);
 		try {
-			Thread.sleep((int)(getSleepTime(MAX_ANGLE, MAX_RADIUS)*1000));
+			Thread.sleep((int) (getSleepTime(MAX_ANGLE, MAX_RADIUS) * 1000));
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		this.currentState = States.Reading;
+		if (this.currentState != States.Waiting) {
+			this.currentState = States.Reading;
+		}
+
 		this.acessoRobot.release();
 	}
-	
-	public int totalSleepTime(){
-		
+
+	public int totalSleepTime() {
+
 		double firstSleep = getSleepTime(MAX_DISTANCE);
 		double secondSleep = getSleepTime(MAX_ANGLE, MAX_RADIUS);
-		
-		return (int)(firstSleep + secondSleep);
+
+		return (int) (firstSleep + secondSleep);
 	}
-	
-	private void doReading(){
-		if(this.theRobot.GetTouchSensor()){
+
+	private void doReading() {
+		if (this.theRobot.GetTouchSensor()) {
 			try {
 				this.acessoRobot.acquire();
 				this.theRobot.Parar(true);
-				this.currentState = States.Running;
+				if (this.currentState != States.Waiting) {
+					this.currentState = States.Running;
+
+				}
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		//menor o sleep mais rapida a resposta 
+		// menor o sleep mais rapida a resposta
 		try {
 			// 1000 ms para robot virtual
 			// 100 para robot fisico
-			Thread.sleep(1000);
+			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	public void myReading(){
+	public void myReading() {
 		this.ownSemaphore.release();
 		this.currentState = States.Reading;
 	}
-	
-	public void myPause(){
+
+	public void myPause() {
 		this.currentState = States.Waiting;
 	}
-	
-	
-	public void updateCheck(boolean checkbox){
+
+	public void updateCheck(boolean checkbox) {
 		this.checked = checkbox;
-		if(!this.checked){
+		if (!this.checked) {
 			myPause();
 			this.log("MANDEI PARA O WAITING");
-		}else{
+		} else {
 			myReading();
 		}
 	}
-
-
 
 }
