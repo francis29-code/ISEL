@@ -32,7 +32,7 @@ totalBits = 7
 #numero bits de controlo
 controlBits = totalBits-messageBits
 #polinomio gerador
-P = np.array([[0,1,1],[1,1,0],[1,0,1],[1,1,1]])
+P = np.array([[1,1,1],[1,1,0],[1,0,1],[0,1,1]])
 
 #mensagem de teste
 teste = np.array([1,0,1,0,1,1,1,1])
@@ -65,19 +65,23 @@ def hamming(message):
     count = 0
     for i in range(0,len(currentMessage),messageBits):
         currentSlice = currentMessage[i:i+messageBits]
+        # print("current slice: ")
+        # print(currentSlice)
+        # print("\n")
         #bits de paridade resultantes
         addControl =  np.mod(np.dot(currentSlice,G),2)
+        # print("control slice: ")
+        # print(addControl)
+        # print("\n")
         for x in range(0,len(addControl)):
             finalBits[count] = addControl[x]
             count += 1
 
-    # print("tamanho final bits : " + str(len(finalBits)))
-    # print("\n")
     return finalBits.astype('int16')
 
 def sindrome(message):
     #possiveis sindromas
-    sindromeTable = np.array([[0,1,1],[1,1,0],[1,0,1],[1,1,1],[1,0,0],[0,1,0],[0,0,1]])
+    sindromeTable = np.array([[1,1,1],[1,1,0],[1,0,1],[0,1,1],[1,0,0],[0,1,0],[0,0,1]])
     #percorre o sinal
     errors = 0
     index = 0
@@ -96,16 +100,16 @@ def sindrome(message):
         # print("\n")
         for x in range(0,len(sindromeTable)):
             if(sum(sindromeTable[x]==sindromeResult)==controlBits):
-                message[i+count] = (message[i+count]+1)%2
+                message[i+x] = (message[i+x]+1)%2
                 #apenas corrige um erro
                 correctedbits += 1
 
                 #
-                # print("indice da tabala: " + str(x))
+                # print("indice da tabela: " + str(x))
                 # print("sindromeTable message: " + str(sindromeTable[x]))
                 # print("numero do count: " + str(count))
                 # print("\n")
-                #
+                # #
                 # print("entrou")
                 # print("mensagem corrigida - sindroma : " + str(message[i:i+totalBits]))
                 # print("\n")
@@ -138,10 +142,11 @@ def simulation():
     noise = 1*np.logical_xor(signalControl, np.random.binomial(1,BERt, len(signalControl)))
     #correcao do sinal
     correctedB, corrected = sindrome(noise)
-    #medicao do BER sem correcao
+    #medicao do BER sem correcao (TEORICO)
     BerScorrecao = sum(np.logical_xor(signalControl,noise))/float(len(signalControl))
-    print ("BER sem correcao")
-    print (str(BerScorrecao))
+    berTeorico = ((3.0*14.0)/2.0)*(BerScorrecao**2.0)
+    print("BER teorico")
+    print(str(berTeorico))
     print("\n")
 
     #medicao do BER apos correcao
@@ -154,7 +159,7 @@ def simulation():
 
 
     berCcorrecao = float(erro)/float(len(signalCodif))
-    print ("BER com correcao")
+    print ("BER com correcao (PRATICO)")
     print (str(berCcorrecao))
     print("\n")
     #descodificacao do sinal
@@ -173,13 +178,37 @@ def simulation():
     print("\n")
 
     #gravacao do sinal apos todo o processo
-    recordSignal("sinalteste8kR8.wav",fsRecord,signalQuant.astype('int16'))
+    # recordSignal("sinal.wav",fsRecord,signalQuant.astype('int16'))
+    wav.write(caminho+"sinal.wav",fsRecord,signalQuant.astype('int16'))
 
 
 
 if __name__ == "__main__":
-
+    # ber = 0.1
     simulation()
+
+    # print("Array inicial")
+    # print(teste)
+    # print("\n")
+    #
+    #
+    # testeControl = hamming(teste)
+    # print("array control")
+    # print(testeControl)
+    # print("\n")
+    # noise = 1*np.logical_xor(testeControl, np.random.binomial(1,ber, len(testeControl)))
+    #
+    # print("Array noise")
+    # print(noise)
+    # print("\n")
+    #
+    # bitsC, testeC = sindrome(noise)
+    #
+    # print("Array Corrigido")
+    # print(testeC)
+    # print("\n")
+
+
 
 
 print("--- %s seconds ---" % (time.time() - start_time))

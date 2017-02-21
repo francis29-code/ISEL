@@ -54,17 +54,6 @@ def createTable(R, Vmax):
 #retorna dois numpy arrays com o sinal quantificado
 #e outro com os indices dos niveis de quantificação usados
 def quantificacao(sinalAmostrado, NQ, VD):
-    #  xq = np.zeros(len(sinalAmostrado))
-    #  indices = np.zeros(len(sinalAmostrado))
-     #
-    #  for i in range(len(sinalAmostrado)):
-    #      numero_de_valores = VD >= sinalAmostrado[i]
-     #
-    #      resultado = np.nonzero(numero_de_valores)
-    #      xq2 = resultado[0][0]-1
-    #      xq[i] = NQ[xq2]
-    #      indices[i] = xq2
-    #  return xq,indices.astype('int16')
      sinalQuantificado = np.zeros(len(sinalAmostrado))
      indiceQuant = np.zeros(len(sinalAmostrado))
      maximo = np.max(np.abs(sinalAmostrado))

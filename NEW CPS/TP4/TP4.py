@@ -59,7 +59,9 @@ def canalAWGN(signal,noisePower):
     return signalOut
 
 def BERteorico(arrayIN, arrayOUT):
-    return sum(np.logical_xor(arrayIN,arrayOUT))/float(len(arrayIN))
+    BerScorrecao = sum(np.logical_xor(arrayIN,arrayOUT))/float(len(arrayIN))
+    berTeorico = ((3.0*14.0)/2.0)*(BerScorrecao**2.0)
+    return berTeorico
 
 def BERpratico(arrayIN,arrayOUT):
     erro=0
