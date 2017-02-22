@@ -1,0 +1,7 @@
+steeringleft:0
+steeringright:0
+distCtrl:20
+debugbool:true
+distance:10
+angle:90
+radius:5
