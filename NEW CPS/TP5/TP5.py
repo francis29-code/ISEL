@@ -46,7 +46,6 @@ def QPSK(arrayBits,P,Eb):
         for i in range(len(arrayBits)):
             currentMessage[i] = arrayBits[i]
 
-
     #iterador do array de fases
     currentPosition = 0
     #calculo da amplitude constante
@@ -222,8 +221,8 @@ def sistema(correcao):
         #desquantificacao do sinal
         signalQuant = quantificacaoInversa(decodedSignal,NQ)
 
-        ################ ---- ERROS ------ ##########################
-        ######---------------medicao de BER's-------------------####
+        ################## ---- ERROS ------ ########################
+        ######-------------medicao de BER's----------------------####
         if(correcao):
             berTeoricoBefore[i] = BERteorico(signalCodif,corrected)
             berPraticoBefore[i] = BERpratico(signalCodif,corrected)
@@ -292,5 +291,5 @@ def sistema(correcao):
 
 
 if __name__ == "__main__":
-    sistema(True)
+    sistema(False)
     # simulate_teste()
