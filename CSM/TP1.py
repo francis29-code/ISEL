@@ -1,12 +1,18 @@
 import numpy as np
 import cv2 as cv
 import sys
-caminho = str(sys.path[0])+"\\"
+path = str(sys.path[0])+"\\"
+
+def saveImage(nome,image,quality=100):
+    newQ = (cv.IMWRITE_JPEG_QUALITY,quality)
+    newName = path+nome+" - "+str(quality)+'.jpg'
+    cv.imwrite(newName,image,newQ)
+    print("saveImage -> Qualidade: {} | Nome: {}".format(quality,newName[len(path):]))
 
 
 def ex1():
 
-    img = cv.imread(caminho+'lenac.tif')
+    img = cv.imread(path+'lenac.tif')
     cv.imshow('Original Image', img)
 
     #indica-nos o datatype
@@ -20,15 +26,15 @@ def ex1():
 
 def ex2():
     #leitura da imagem incial
-    img = cv.imread(caminho+'lenac.tif')
+    img = cv.imread(path+'lenac.tif')
 
     #gravação das duas imagens
-    cv.imwrite(caminho+'imagem80.jpg',img,(cv.IMWRITE_JPEG_QUALITY,80))
-    cv.imwrite(caminho+'imagem10.jpg',img,(cv.IMWRITE_JPEG_QUALITY,10))
+    saveImage('imagem',img,80)
+    saveImage('imagem',img,10)
 
     #leitura das imagens gravadas
-    img80 = cv.imread(caminho+'imagem80.jpg')
-    img10 = cv.imread(caminho+'imagem10.jpg')
+    img80 = cv.imread(path+'imagem - 80.jpg')
+    img10 = cv.imread(path+'imagem - 10.jpg')
 
     ##duas imagens gravadas
     cv.imshow('Imagem 80', img80)
@@ -38,9 +44,19 @@ def ex2():
     cv.waitKey(0)
 
     #calculo da SNR
-    SNR  = 10*np.log10((np.sum(img10)**2)/np.sum((img10-img80))**2)
+    SNR  = 10*np.log10((np.sum(img10)**2)/(np.sum((img10-img80))**2))
 
-    print(str(SNR))
+    print("\nSNR - dB -> " + str(SNR))
+
+    #calculo MSE
+    # (1/lenLinhas * lenColunas) * [somatorioAP - somatorioOR]**2
+
+    #calculo PSNR
+    # 10log10(255**2/MSE)
+
+def ex3():
+
+
 
 
 
