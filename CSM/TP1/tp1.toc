@@ -1,0 +1,10 @@
+\select@language {portuguese}
+\contentsline {section}{\numberline {1}Introdu\IeC {\c c}\IeC {\~a}o}{2}
+\contentsline {section}{\numberline {2}Desenvolvimento}{3}
+\contentsline {subsection}{\numberline {2.1}Imagem original}{4}
+\contentsline {subsection}{\numberline {2.2}Tamanhos dos ficheiros, taxas de compress\IeC {\~a}o, SNR e PSNR}{4}
+\contentsline {subsection}{\numberline {2.3}Imagem em n\IeC {\'\i }veis de cinzento}{7}
+\contentsline {subsection}{\numberline {2.4}Histograma da imagem em n\IeC {\'\i }veis de cinzento}{9}
+\contentsline {subsection}{\numberline {2.5}Manipula\IeC {\c c}\IeC {\~a}o de pixeis na imagem}{10}
+\contentsline {subsection}{\numberline {2.6}Manipula\IeC {\c c}\IeC {\~a}o dos quatro bits mais significantes da imagem}{11}
+\contentsline {section}{\numberline {3}Conclus\IeC {\~o}es}{13}
