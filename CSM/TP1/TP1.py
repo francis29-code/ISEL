@@ -116,12 +116,14 @@ def ex3():
     saveImage('escalaCinzentos',imgGray,100,'.bmp')
 
     cv.waitKey(0)
+    cv.destroyAllWindows()
 
 def ex4():
     #leitura da imagem
     img = readImage("escalaCinzentos - 100.bmp")
     #histograma da imagem em Cinzentos
     plt.hist(img.ravel(),256,[0,256])
+    plt.savefig(path+'histograma.png')
     plt.show()
 
     #cria array de valores UNICOS do histograma
@@ -131,32 +133,33 @@ def ex4():
 def ex5():
     #leitura imagem
     img = readImage('escalaCinzentos - 100.bmp')
-    count=0
+
     for i in range(8):
-        count += (2.**i)
-        imageBit = img > count
+        imageBit = img & (2**i)
         showImage('BW - bit: {}'.format(i),imageBit*1.)
+        saveImage('BW-bit'+str(i),imageBit,formato=".bmp")
 
     cv.waitKey(0)
+    cv.destroyAllWindows()
 
 def ex6():
 
     img = readImage('escalaCinzentos - 100.bmp')
-
-    imageBit = img << 4
-
+    imageBit = img & 240
     showImage('BW - 4 bits',imageBit*1)
-
+    saveImage('4bitsSignificativos',imageBit,formato=".bmp")
     cv.waitKey(0)
+    cv.destroyAllWindows()
 
 
 def ex7(angle):
     #width & height
-    w ,h = (400,400)
+    w ,h = (200,200)
     #criação do array da imagem
     img = np.ones((w,h,3),np.uint8)
 
     #uso da , indica que estamos a selecionar uma lista na posicação do slice
+    # img[:,0:,int(w/2)] = (255,0,0)
     print("Valores Linhas: {} | Colunas: {}".format(img.shape[0],img.shape[1]))
 
     #fundo branco
@@ -170,15 +173,17 @@ def ex7(angle):
 
     #angulo dado pelo utilizador
     for i in range(times):
-        newCenterX = int(np.round(center[0] + w * np.cos((i*angle) * np.pi / 180.0)))
-        newCenterY = int(np.round(center[1] + w * np.sin((i*angle) * np.pi / 180.0)))
-        newCenter = (newCenterX,newCenterY)
+        endingPX = int(center[0] + w * np.cos((i*angle) * np.pi / 180.0))
+        endingPY = int(center[1] + w * np.sin((i*angle) * np.pi / 180.0))
+        endingP = (endingPX,endingPY)
 
-        cv.line(img,center,newCenter,(0,0,0),2)
+        cv.line(img,center,endingP,(0,0,0))
 
     showImage('Imagem Criada',img)
+    saveImage('ImagemCriada',img,formato=".jpg")
 
     cv.waitKey(0)
+    cv.destroyAllWindows()
 
     print("ex7")
 
@@ -188,7 +193,7 @@ if __name__ == "__main__":
     # ex1()
     # ex2()
     # ex3()
-    # ex4()
+    ex4()
     # ex5()
     # ex6()
-    ex7(1)
+    # ex7(2)
