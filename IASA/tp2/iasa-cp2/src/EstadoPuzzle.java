@@ -16,12 +16,10 @@ public class EstadoPuzzle extends Estado{
 	
 	@Override
 	public String toString(){
-		return "Puzzle: "+puzzle.toString();
+		return puzzle.toString();
 	}
 	
 	public Puzzle getPuzzle(){
 		return puzzle;
 	}
-	
-
 }

@@ -8,19 +8,10 @@ import pee.Procura;
 
 public class ProcuraCustoUnif extends ProcuraMelhorPrim<Problema> implements Procura {
 
-//	@Override
-//	public Solucao resolver(Problema problema) {
-//	
-//		return null;
-//	}
-//
-//	@Override
-//	public Solucao resolver(Problema problema, int profMax) {
-//		return null;
-//	}
-
 	@Override
 	protected double f(No no) {
+		//f(n) = g(n)
+		//sendo que g(n) apenas usa o CUSTO
 		return no.getCusto();
 		
 	}

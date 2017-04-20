@@ -18,7 +18,6 @@ public abstract class MecanismoProcura <P extends Problema>{
 		this.no_inicial = null;
 		this.no = null;
 		this.memoria_procura = iniciarMemoria();
-		
 	}
 	
 	public Solucao resolver(P problema){
@@ -39,6 +38,7 @@ public abstract class MecanismoProcura <P extends Problema>{
 			}else{
 				if(no.getProfundidade() <= profMax){
 					expandir(no);
+					
 				}
 			}
 		}
@@ -71,10 +71,19 @@ public abstract class MecanismoProcura <P extends Problema>{
 			antecessor = no.getAntecessor();
 			no = antecessor;
 		}
+		
 		return percurso;
+		
+		
 	}
 	
 	protected abstract MemoriaProcura iniciarMemoria();
 	
+	public int getComplexidadeTemporal(){
+		return memoria_procura.getComplexidadeTemporal();
+	}
 	
+	public int getComplexidadeEspacial(){
+		return memoria_procura.getComplexidadeEspacial();
+	}
 }

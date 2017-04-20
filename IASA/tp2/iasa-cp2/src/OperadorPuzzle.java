@@ -25,7 +25,6 @@ public class OperadorPuzzle implements Operador{
 				return new EstadoPuzzle(newPuzzle);
 			}
 		}
-		
 		return null;
 	}
 

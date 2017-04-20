@@ -20,7 +20,7 @@ public abstract class ProcuraMelhorPrim<P extends Problema>
 		 * 0 - quando o1 igual a o2
 		 * -1 - quando o1 menor o2
 		 */
-		return Double.compare(o1.getCusto(), o2.getCusto());
+		return Double.compare(f(o1), f(o2));
 	}
 	
 	
