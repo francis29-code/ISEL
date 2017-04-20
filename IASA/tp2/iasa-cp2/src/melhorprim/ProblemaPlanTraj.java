@@ -7,7 +7,7 @@ public class ProblemaPlanTraj extends Problema{
 	
 	private EstadoLocalidade estadoFinal;
 
-	public ProblemaPlanTraj(String locini, String locfin, OperadorPuzzle[] operadores) {
+	public ProblemaPlanTraj(String locini, String locfin, OperadorLigacao[] operadores) {
 		super(new EstadoLocalidade(locini),operadores);
 		estadoFinal = new EstadoLocalidade(locfin);
 	}

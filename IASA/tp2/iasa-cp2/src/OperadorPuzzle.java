@@ -1,25 +1,36 @@
 import modProb.Estado;
 import modProb.Operador;
 import puzzle.Puzzle;
+import puzzle.Puzzle.Movimento;
 
 public class OperadorPuzzle implements Operador{
 
-	int custoJogada;
-	public OperadorPuzzle(Puzzle.Movimento movimento){
+	private int custoJogada;
+	private Movimento movimento;
+	
+	public OperadorPuzzle(Movimento movimento){
 		//enumerado
+		this.movimento = movimento;
 		this.custoJogada = 1;
 	}
 	@Override
 	public Estado aplicar(Estado estado){
-		//cada jogada tem custo 1
 		//transformações no espaço vazio do puzzle
 		//movimentar o movimento do construtor
+		Puzzle puzzle, newPuzzle;
+		if(estado instanceof EstadoPuzzle){
+			puzzle = ((EstadoPuzzle) estado).getPuzzle();
+			newPuzzle = puzzle.movimentar(movimento);
+			if(newPuzzle != null){
+				return new EstadoPuzzle(newPuzzle);
+			}
+		}
+		
 		return null;
 	}
 
 	@Override
 	public float custo(Estado estado, Estado estadoSuc) {
-		// TODO Auto-generated method stub
-		return 0;
+		return custoJogada;
 	}
 }

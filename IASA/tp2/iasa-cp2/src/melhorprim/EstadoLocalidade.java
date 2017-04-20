@@ -17,7 +17,6 @@ public class EstadoLocalidade extends Estado{
 	}
 	
 	//override no metodo inbuilt da classe abstracta estado
-	//a ser usada na classe NO
 	@Override
 	public String toString(){
 		return "Estado: " + localidade;
