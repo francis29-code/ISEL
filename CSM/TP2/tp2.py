@@ -1,9 +1,16 @@
+import sys
+sys.path.insert(0,str(sys.path[0])+"\\..\\TP1")
 import numpy as np
 import cv2 as cv
 import matplotlib.pyplot as plt
-import sys
 import os
 from heapq import heappush, heappop, heapify
+#parametros -> nome da imagem,path
+from TP1 import readImage
+#parametros -> titulos,imagem
+from TP1 import showImage
+#parametros -> nome,imagme,qualidade(opcional),formato(opcional)
+from TP1 import saveImage
 
 path = str(sys.path[0])+"\\"
 
@@ -42,11 +49,6 @@ def gera_huffman(simb,ocurr):
 
 
 if __name__ == "__main__":
-    a = np.array([1,2,3,4])
-    b = np.array([4,3,2,1])
-
-    array,freq = gera_huffman(a,b)
-    print("\n"+str(array))
-
-    # for i in array:
-    #     print(i)
+    imagem = readImage('lenac.tif')
+    showImage('lena',imagem)
+    cv.waitKey(0)

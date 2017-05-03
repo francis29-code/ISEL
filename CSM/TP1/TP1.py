@@ -11,8 +11,8 @@ def saveImage(nome,image,quality=100,formato=".jpg"):
     cv.imwrite(newName,image,newQ)
     print("\nsaveImage -> Qualidade: {} | Nome: {}".format(quality,newName[len(path):]))
 
-def readImage(nome):
-    img = cv.imread(path+nome)
+def readImage(nome,caminho=path):
+    img = cv.imread(caminho+nome)
     return img
 
 def showImage(titulo,img):
@@ -122,7 +122,7 @@ def ex4():
     #leitura da imagem
     img = readImage("escalaCinzentos - 100.bmp")
     #histograma da imagem em Cinzentos
-    plt.hist(img.ravel(),256,[0,256])
+    plt.hist(img.ravel(),256,[0,256], color='r')
     plt.savefig(path+'histograma.png')
     plt.show()
 
