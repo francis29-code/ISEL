@@ -1,0 +1,17 @@
+\select@language {portuguese}
+\contentsline {section}{\numberline {1}Introdu\IeC {\c c}\IeC {\~a}o}{3}
+\contentsline {section}{\numberline {2}Desenvolvimento}{4}
+\contentsline {subsection}{\numberline {2.1}Algoritmo de Huffman}{5}
+\contentsline {subsubsection}{\numberline {2.1.1}Algoritmo de codifica\IeC {\c c}\IeC {\~a}o de Huffman}{5}
+\contentsline {subsubsection}{\numberline {2.1.2}Descodifica\IeC {\c c}\IeC {\~a}o de Huffman}{7}
+\contentsline {subsection}{\numberline {2.2}Escrita e Leitura em ficheiro}{7}
+\contentsline {subsubsection}{\numberline {2.2.1}Escrita}{7}
+\contentsline {subsubsection}{\numberline {2.2.2}Leitura}{8}
+\contentsline {subsection}{\numberline {2.3}Resultados obtidos}{8}
+\contentsline {subsubsection}{\numberline {2.3.1}Tempos de processamento}{9}
+\contentsline {subsubsection}{\numberline {2.3.2}Entropia}{9}
+\contentsline {subsubsection}{\numberline {2.3.3}N\IeC {\'u}mero m\IeC {\'e}dio de bits}{10}
+\contentsline {subsubsection}{\numberline {2.3.4}Efici\IeC {\^e}ncia}{10}
+\contentsline {subsubsection}{\numberline {2.3.5}Valores obtidos}{10}
+\contentsline {subsubsection}{\numberline {2.3.6}Ficheiros obtidos}{11}
+\contentsline {section}{\numberline {3}Conclus\IeC {\~o}es}{12}
