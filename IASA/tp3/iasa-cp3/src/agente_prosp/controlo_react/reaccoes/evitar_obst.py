@@ -13,5 +13,5 @@ class EvitarObst(Reaccao):
 
 
     def _detetar_estimulo(self, percepcao):
-        if percepcao[FRT].contacto:
+        if percepcao[FRT].contacto and percepcao[FRT].obstaculo:
             return percepcao[ESQ].distancia
