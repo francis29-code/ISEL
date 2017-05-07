@@ -1,5 +1,5 @@
 class Comportamento:
 
-    def activar(percepcao):
+    def activar(self,percepcao):
         #retorna uma resposta
         raise NotImplementedError
