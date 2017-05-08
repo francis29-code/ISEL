@@ -1,5 +1,5 @@
 
-from comportcomp import ComportComp
+from ecr.comportcomp import ComportComp
 
 class Prioridade(ComportComp):
 

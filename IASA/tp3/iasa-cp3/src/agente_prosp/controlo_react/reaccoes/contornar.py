@@ -1,7 +1,7 @@
-from reaccao import Reaccao
+from ecr.reaccao import Reaccao
 from psa.actuador import FRT, ESQ, DIR
 from psa.accao import Mover
-from resposta import Resposta
+from ecr.resposta import Resposta
 
 class Contornar(Reaccao):
 
@@ -10,7 +10,7 @@ class Contornar(Reaccao):
         prioridade = 1/(1+estimulo)
         return Resposta(accao,prioridade)
 
-
     def _detetar_estimulo(self, percepcao):
-        if percepcao[ESQ].obstaculo or percepcao[DIR].obstaculo:
-            return percepcao[FRT].distancia
+        if (percepcao[ESQ].obstaculo and percepcao[ESQ].contacto) or \
+        (percepcao[DIR].obstaculo and percepcao[DIR].contacto):
+            return True

@@ -1,4 +1,4 @@
-from comportamento import Comportamento
+from ecr.comportamento import Comportamento
 
 class ComportComp(Comportamento):
 

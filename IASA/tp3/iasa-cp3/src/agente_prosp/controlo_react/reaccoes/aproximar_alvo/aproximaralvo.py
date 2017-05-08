@@ -1,5 +1,5 @@
-from aproximar_alvo_dir import AproximarAlvoDIR
-from prioridade import Prioridade
+from controlo_react.reaccoes.aproximar_alvo.aproximar_alvo_dir.aproximar_alvo_dir import AproximarAlvoDIR
+from ecr.prioridade import Prioridade
 from psa.actuador import FRT,ESQ,DIR
 
 class AproximarAlvo(Prioridade):

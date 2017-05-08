@@ -1,8 +1,8 @@
 
-from reaccao import Reaccao
+from ecr.reaccao import Reaccao
 from psa.actuador import FRT,ESQ,DIR
 from psa.accao import Mover
-from resposta import Resposta
+from ecr.resposta import Resposta
 
 class AproximarAlvoDIR(Reaccao):
 
@@ -15,6 +15,5 @@ class AproximarAlvoDIR(Reaccao):
 
     def _gerar_resposta(self,estimulo):
         accao = Mover(self._direccao)
-        #estimulo nunca 0
         prioridade = 1/(1+estimulo)
         return Resposta(accao,prioridade)

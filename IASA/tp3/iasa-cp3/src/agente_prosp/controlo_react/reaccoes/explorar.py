@@ -1,6 +1,6 @@
 
-from comportamento import Comportamento
-from resposta import Resposta
+from ecr.comportamento import Comportamento
+from ecr.resposta import Resposta
 import random
 from psa.accao import Mover
 from psa.actuador import FRT,ESQ,DIR
