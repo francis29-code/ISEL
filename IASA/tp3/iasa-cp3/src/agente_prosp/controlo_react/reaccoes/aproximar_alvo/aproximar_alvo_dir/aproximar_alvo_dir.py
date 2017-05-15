@@ -11,7 +11,7 @@ class AproximarAlvoDIR(Reaccao):
 
     def _detetar_estimulo(self,percepcao):
         if percepcao[self._direccao].alvo:
-            return percepcao[self._direccao].distancia
+            return percepcao[self._direccao].distancia #distancia do alvo
 
     def _gerar_resposta(self,estimulo):
         accao = Mover(self._direccao)

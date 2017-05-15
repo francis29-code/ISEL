@@ -7,10 +7,7 @@ from ecr.resposta import Resposta
 class EvitarObst(Reaccao):
 
     def _gerar_resposta(self, estimulo):
-        accao = Mover(ESQ)
-        prioridade = 1/(1+estimulo)
-        return Resposta(accao,prioridade)
+        return Resposta(Mover(ESQ))
 
     def _detetar_estimulo(self, percepcao):
-        if percepcao[FRT].contacto and percepcao[FRT].obstaculo:
-            return True
+        return percepcao[FRT].contacto and percepcao[FRT].obstaculo

@@ -7,5 +7,5 @@ from controlo_react.reaccoes.contornar import Contornar
 class Recolher(Hierarquia):
 
     def __init__(self):
-        listaComportamentos = [Explorar(),EvitarObst(),AproximarAlvo(),Contornar()]
+        listaComportamentos = [AproximarAlvo(),EvitarObst(),Contornar(),Explorar()]
         Hierarquia.__init__(self, listaComportamentos)

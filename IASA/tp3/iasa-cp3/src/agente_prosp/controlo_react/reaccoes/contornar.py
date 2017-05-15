@@ -6,11 +6,9 @@ from ecr.resposta import Resposta
 class Contornar(Reaccao):
 
     def _gerar_resposta(self, estimulo):
-        accao = Mover(FRT)
-        prioridade = 1/(1+estimulo)
-        return Resposta(accao,prioridade)
+        print "passei Contornar"
+        return Resposta(Mover(FRT))
 
     def _detetar_estimulo(self, percepcao):
-        if (percepcao[ESQ].obstaculo and percepcao[ESQ].contacto) or \
-        (percepcao[DIR].obstaculo and percepcao[DIR].contacto):
-            return True
+        return (percepcao[ESQ].contacto and percepcao[ESQ].obstaculo) \
+        or (percepcao[DIR].contacto and percepcao[DIR].obstaculo)

@@ -2,7 +2,6 @@
 import sys
 sys.path.append("../lib")
 sys.path.append("../agente_prosp")
-#######################ldkçdmlkclkcjkc kj
 import psa
 from agenteprospector import AgenteProspector
 from controlo_react.controloreact import ControloReact
