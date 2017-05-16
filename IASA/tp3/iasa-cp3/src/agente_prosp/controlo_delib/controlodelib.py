@@ -5,9 +5,10 @@ class ControloDelib(Controlo):
 
     def __init__(self,planeador):
         self._planeador = planeador
+        #instancia um modelo do mundo
         self._modelo_mundo = ModeloMundo()
-        #não está na arquitetura
-        #não faz sentido planear sem objectivos
+        #nao esta na arquitetura
+        #nao faz sentido planear sem objectivos
         self._objectivos = []
 
     def _reconsiderar(self):
@@ -21,7 +22,7 @@ class ControloDelib(Controlo):
 
     def _deliberar(self):
         #void
-        # objectivos são gerados aqui
+        # objectivos sao gerados aqui
         for estado in self._modelo_mundo.estados():
             elemento = self._modelo_mundo.obter_elem(estado)
             if elemento == "alvo":
@@ -33,9 +34,10 @@ class ControloDelib(Controlo):
 
     def _executar(self):
         #accao
-        operador = obter_accao(self._planeador.obter_accao(self._modelo_mundo.estado))
+        operador = self._planeador.obter_accao(self._modelo_mundo.estado)
         if operador is not None:
-            return operador.accao
+            #operador tem um accao que e recebido no agente prospector
+            return operador
 
     def processar(self,percepcao):
         #accao

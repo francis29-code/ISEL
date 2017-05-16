@@ -1,12 +1,13 @@
 
 from controlo_delib.modeloplan import ModeloPlan
 from psa.util import dirmov
+from controlo_delib.operadormover import OperadorMover
 
 class ModeloMundo(ModeloPlan):
 
     def __init__(self):
-        #estado é um tuplo (X,Y)
-        self.alterado =False
+        #estado e um tuplo (X,Y)
+        self.alterado = False
         #dicionario proveniente da percepcao do ambiente
         self._elementos = {}
         #posicao atual do agente
@@ -14,8 +15,9 @@ class ModeloMundo(ModeloPlan):
         #todos os estado do dicionario
         self._estados = None
         #instanciar operadores com todas as direcoes
-        #sendo que self é o próprio modelo_mundo
-        self._operadores = [OperadorMover(self,move) for move in dirmov]
+        #sendo que self e o proprio modelo_mundo
+        #sendo que move e um angulo
+        self._operadores = [OperadorMover(self,move) for move in dirmov()]
         # for move in dirmov:
         #     self._operadores.append(OperadorMover(self,move))
 
@@ -23,7 +25,7 @@ class ModeloMundo(ModeloPlan):
         #string
         elemento = self._elementos.get(estado)
         if elemento is not None:
-            #retorna string "ALVO" ou não
+            #retorna string "ALVO" ou nao
             return elemento
 
     def actualizar(self,percepcao):
@@ -41,6 +43,7 @@ class ModeloMundo(ModeloPlan):
             self.alterado = False
             self.estado = percepcao.posicao
             self._estados = percepcao.imagem.keys()
+
 
     def operadores(self):
         #lista de operadores do modelo_mundo

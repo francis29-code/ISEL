@@ -12,4 +12,4 @@ class ProblemaPlan(ProblemaHeur):
         return estado == self._estado_final
 
     def heuristica(self,estado):
-        return dist(estado,estado_final)
+        return dist(estado,self._estado_final)

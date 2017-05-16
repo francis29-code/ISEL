@@ -1,4 +1,4 @@
-from psa.actuador import Mover
+from psa.accao import Mover
 from psa.util import dist,mover,dirmov
 
 class OperadorMover:
