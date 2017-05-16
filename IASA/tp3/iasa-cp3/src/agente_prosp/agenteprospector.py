@@ -11,7 +11,6 @@ class AgenteProspector(Agente):
         resposta = self._processar(percepcao)
         self._actuar(resposta.accao)
 
-
     def _percepcionar(self):
         return self.sensor_multiplo.detectar()
 

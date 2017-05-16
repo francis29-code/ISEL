@@ -14,4 +14,4 @@ from pee.melhorprim.procura_custo_unif import ProcuraCustoUnif
 
 psa.iniciar("amb/amb2.das")
 
-psa.executar(AgenteProspector(ControloDelib(PlanPEE(ProcuraSofrega()))))
+psa.executar(AgenteProspector(ControloDelib(PlanPEE(ProcuraAA()))))

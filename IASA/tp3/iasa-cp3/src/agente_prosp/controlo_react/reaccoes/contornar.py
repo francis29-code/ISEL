@@ -6,7 +6,6 @@ from ecr.resposta import Resposta
 class Contornar(Reaccao):
 
     def _gerar_resposta(self, estimulo):
-        print "passei Contornar"
         return Resposta(Mover(FRT))
 
     def _detetar_estimulo(self, percepcao):

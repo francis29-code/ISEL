@@ -14,11 +14,8 @@ class ControloDelib(Controlo):
     def _reconsiderar(self):
         #booleano
         #se nao houver objectivos, se nao houver planos, se o mundo mudar
-        if len(self._objectivos)==0 or self._planeador.plano_pendente() \
-            or self._modelo_mundo.alterado:
-            return True
-
-        return False
+        return len(self._objectivos)==0 or self._planeador.plano_pendente() \
+            or self._modelo_mundo.alterado
 
     def _deliberar(self):
         #void
@@ -46,7 +43,6 @@ class ControloDelib(Controlo):
         if (self._reconsiderar()):
             self._deliberar()
             self._planear()
-
         return self._executar()
 
     def _assimilar(self,percepcao):
