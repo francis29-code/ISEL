@@ -1,4 +1,4 @@
-from controlo_react.controlo import Controlo
+from controlo import Controlo
 
 class ControloReact(Controlo):
 

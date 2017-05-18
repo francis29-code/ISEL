@@ -34,15 +34,15 @@ class ModeloMundo(ModeloPlan):
         #imagem = 'alvo' 'obst' 'vazio'
         #posicoes como keys
         # percepcao.posicao = TUPLO (X,Y)
+
+        self.estado = percepcao.posicao
+
         if self._elementos != percepcao.imagem:
             self._elementos = percepcao.imagem
-            self.estado = percepcao.posicao
             self.alterado = True
             self._estados = percepcao.imagem.keys()
         else:
             self.alterado = False
-            self.estado = percepcao.posicao
-            self._estados = percepcao.imagem.keys()
 
 
     def operadores(self):

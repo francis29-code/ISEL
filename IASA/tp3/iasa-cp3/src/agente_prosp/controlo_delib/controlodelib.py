@@ -1,5 +1,5 @@
 from controlo_delib.modelomundo import ModeloMundo
-from controlo_react.controlo import Controlo
+from controlo import Controlo
 
 class ControloDelib(Controlo):
 
@@ -14,16 +14,20 @@ class ControloDelib(Controlo):
     def _reconsiderar(self):
         #booleano
         #se nao houver objectivos, se nao houver planos, se o mundo mudar
-        return len(self._objectivos)==0 or self._planeador.plano_pendente() \
+        return not self._objectivos or not self._planeador.plano_pendente() \
             or self._modelo_mundo.alterado
 
     def _deliberar(self):
         #void
         # objectivos sao gerados aqui
+        aux = []
         for estado in self._modelo_mundo.estados():
             elemento = self._modelo_mundo.obter_elem(estado)
             if elemento == "alvo":
-                self._objectivos.append(estado)
+                aux.append(estado)
+
+        self._objectivos = aux
+
 
     def _planear(self):
         #void
@@ -43,6 +47,7 @@ class ControloDelib(Controlo):
         if (self._reconsiderar()):
             self._deliberar()
             self._planear()
+
         return self._executar()
 
     def _assimilar(self,percepcao):
