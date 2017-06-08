@@ -1,0 +1,8 @@
+AuthType Digest
+AuthName "Authentication HTTP - Digest"
+AuthDigestProvider file
+AuthUserFile "C:\Users\cajo\Documents\Aulas\UCs\Bolonha\LERCM\SMI\2016-2017-SV-(cajo)\Exemplos\PHP\07-Auth\.htauth-digest.pw"
+
+AuthDigestAlgorithm MD5
+
+Require valid-user

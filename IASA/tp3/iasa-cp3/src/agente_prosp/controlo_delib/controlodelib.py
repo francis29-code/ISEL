@@ -53,3 +53,13 @@ class ControloDelib(Controlo):
     def _assimilar(self,percepcao):
         #atualiza o mundo apos assimilar
         self._modelo_mundo.actualizar(percepcao)
+
+    #metodos auxiliares
+    def operadoresMundo(self):
+        return self._modelo_mundo.operadores()
+
+    def estadoInicial(self):
+        return self._modelo_mundo.estado
+
+    def elementos(self):
+        return self._modelo_mundo.dicionario_elementos()

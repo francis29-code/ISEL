@@ -14,4 +14,9 @@ from pee.melhorprim.procura_custo_unif import ProcuraCustoUnif
 
 psa.iniciar("amb/amb2.das")
 
-psa.executar(AgenteProspector(ControloDelib(Planeador(ProcuraAA()))))
+procura = ProcuraAA()
+planeador = Planeador(procura)
+controlo = ControloDelib(planeador)
+agente = AgenteProspector(controlo)
+
+psa.executar(agente)

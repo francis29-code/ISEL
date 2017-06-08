@@ -1,0 +1,5 @@
+AuthType Basic
+AuthName "Authentication HTTP - Basic"
+AuthUserFile "C:\Users\cajo\Documents\Aulas\UCs\Bolonha\LERCM\SMI\2016-2017-SV-(cajo)\Exemplos\PHP\07-Auth\.htauth-basic.pw"
+
+Require valid-user

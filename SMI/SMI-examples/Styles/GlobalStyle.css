@@ -1,0 +1,43 @@
+body {
+	background-color:	#fffaf0;
+}
+
+h1, h2 {
+	color:            #483d8b;
+	font-family:      "lucida calligraphy", arial, 'sans serif'; 
+	color:            blue;
+  text-align:       center;
+}
+
+table.phd {
+	width: 80%;
+	margin-left:auto; 
+    margin-right:auto;
+}
+
+td.phd {
+	border-bottom: 2px solid;
+}
+
+th.frequency {
+	border-top: 4px solid;
+    border-bottom: 2px solid;
+	width: 20%;
+}
+
+th.localMaxs {
+	border-top: 4px solid;
+    border-bottom: 2px solid;
+	width: 20%;
+}
+
+th.ngram {
+	border-top: 4px solid;
+    border-bottom: 2px solid;
+	width: 80%;
+}
+
+th.phd {
+	border-top: 4px solid;
+    border-bottom: 2px solid;
+}

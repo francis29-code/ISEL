@@ -53,6 +53,9 @@ class ModeloMundo(ModeloPlan):
         #lista de tuplos do dicionario
         return self._estados
 
+    def dicionario_elementos(self):
+        return self._elementos;
+
     @property
     def estado(self):
         return self.estado

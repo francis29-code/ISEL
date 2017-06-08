@@ -21,7 +21,7 @@ class OperadorMover(Operador):
         #mover(posicao(xy),angulo):novaPosicao(XY)
         #so e valido se mover se a posicao a que se quiser mover for != de obst
         novo_estado = mover(estado,self._ang)
-        if self._modelo_mundo.obter_elem(novo_estado) != 'obst':
+        if self._modelo_mundo.obter_elem(novo_estado) in ['alvo','vazio']:
             return novo_estado
 
     def custo(self,estado,novo_estado):
