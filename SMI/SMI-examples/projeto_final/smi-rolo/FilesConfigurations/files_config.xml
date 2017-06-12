@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<file>
+<destino_base>File_dir</destino_base>
+<thumb_dst>File_dir\\thumbs</thumb_dst>
+<thumb_Width>200</thumb_Width>
+<thumb_Height>200</thumb_Height>
+</file>
+

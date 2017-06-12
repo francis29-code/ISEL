@@ -2,6 +2,7 @@
   define(
           "credenciaisDB",
           $_SERVER[ "CONTEXT_DOCUMENT_ROOT" ] . DIRECTORY_SEPARATOR  .
+          "SMI-examples" . DIRECTORY_SEPARATOR .
            "projeto_final" . DIRECTORY_SEPARATOR .
            "config" . DIRECTORY_SEPARATOR  .
             ".htconfig.xml" );

@@ -1,0 +1,17 @@
+\select@language {portuguese}
+\contentsline {figure}{\numberline {1}{\ignorespaces Codifica\IeC {\c c}\IeC {\~a}o baseada na DCT\relax }}{6}
+\contentsline {figure}{\numberline {2}{\ignorespaces Descodifica\IeC {\c c}\IeC {\~a}o baseada na IDCT\relax }}{6}
+\contentsline {figure}{\numberline {3}{\ignorespaces Imagem codificada utilizando a DCT\relax }}{6}
+\contentsline {figure}{\numberline {4}{\ignorespaces Imagem descodificada utilizando a IDCT\relax }}{6}
+\contentsline {figure}{\numberline {5}{\ignorespaces Blocos $8\times 8$\relax }}{7}
+\contentsline {figure}{\numberline {6}{\ignorespaces Codifica\IeC {\c c}\IeC {\~a}o e descodifica\IeC {\c c}\IeC {\~a}o baseada na DCT com quantifica\IeC {\c c}\IeC {\~a}o\relax }}{8}
+\contentsline {figure}{\numberline {7}{\ignorespaces Matriz de quantifica\IeC {\c c}\IeC {\~a}o\relax }}{8}
+\contentsline {figure}{\numberline {8}{\ignorespaces Codifica\IeC {\c c}\IeC {\~a}o utilizando DCT com quantifica\IeC {\c c}\IeC {\~a}o\relax }}{9}
+\contentsline {figure}{\numberline {9}{\ignorespaces Descodifica\IeC {\c c}\IeC {\~a}o utilizando IDCT com quantifica\IeC {\c c}\IeC {\~a}o\relax }}{9}
+\contentsline {figure}{\numberline {10}{\ignorespaces Diagrama de blocos do codificador/descodificador JPEG\relax }}{10}
+\contentsline {figure}{\numberline {11}{\ignorespaces Processamento em modo ziguezague\relax }}{13}
+\contentsline {figure}{\numberline {12}{\ignorespaces Primeiro bloco $8\times 8$ resultante da DCT\relax }}{14}
+\contentsline {figure}{\numberline {13}{\ignorespaces DCT e descodifica\IeC {\c c}\IeC {\~a}o para um fator de qualidade de 25\%\relax }}{15}
+\contentsline {figure}{\numberline {14}{\ignorespaces DCT e descodifica\IeC {\c c}\IeC {\~a}o para um fator de qualidade de 50\%\relax }}{15}
+\contentsline {figure}{\numberline {15}{\ignorespaces DCT e descodifica\IeC {\c c}\IeC {\~a}o para um fator de qualidade de 75\%\relax }}{15}
+\contentsline {figure}{\numberline {16}{\ignorespaces Taxa de Compress\IeC {\~a}o em fun\IeC {\c c}\IeC {\~a}o da SNR\relax }}{17}
