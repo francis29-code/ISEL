@@ -10,7 +10,7 @@ class AgenteProspector(Agente):
         percepcao = self._percepcionar()
         resposta = self._processar(percepcao)
         if resposta is not None:
-            self._actuar(resposta.accao)
+            self._actuar(resposta)
 
     def _percepcionar(self):
         return self.sensor_multiplo.detectar()

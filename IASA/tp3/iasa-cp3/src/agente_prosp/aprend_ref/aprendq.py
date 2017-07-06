@@ -1,18 +1,16 @@
-from controlo_delib.aprend_ref.aprend_ref import AprendRef
+from aprend_ref.aprendref import AprendRef
 
 class AprendQ(AprendRef):
 
     def __init__(self,mem_aprend,sel_accao,alfa,gama):
-        #heranca
-        AprendRef.__init__(mem_aprend,sel_accao,alfa,gama)
+        AprendRef.__init__(self,mem_aprend,sel_accao)
         self._alfa = alfa
         self._gama = gama
-        self._mem_aprend = mem_aprend
-        self._sel_accao = sel_accao
+        self._Q = {}
 
     def aprender(self,s,a,r,sn):
-        an = self._sel_accao.max_accao(sn)
-        qsa = self._mem_aprend.obter(s,a)
-        qsnan = self._mem_apred.obter(sn,an)
-        q = qsa +  self._alfa * (r + self._gama * qsnan - qsa)
-        self._mem_aprend.actualizar(s,a,q)
+        Q = self._mem_aprend.obter(s, a)
+        A_next = self._sel_accao.max_accao(sn)
+        Q_next = self._mem_aprend.obter(sn, A_next)
+        Q_final = Q + self._alfa*(r+(self._gama*Q_next)-Q)
+        self._mem_aprend.actualizar(s,a,Q_final)

@@ -1,13 +1,13 @@
-from aprend_ref.memoriaprend import MemoriaAprend
+from aprend_ref.memoriaprend import MemoriAprend
 
-class MemoriaEsparsa(MemoriaAprend):
+class MemoriaEsparsa(MemoriAprend):
 
-    def __init__(self, valor_omissao=0):
+    def __init__(self, valor_omissao=0.0):
         self._valor_omissao = valor_omissao
-        self._dicionario ={}
+        self.memoria ={}
 
     def actualizar(self,s,a,q):
-        self._dicionario[(s,a)]=q
+        self.memoria[(s,a)]=q
 
     def obter(self,s,a):
-        return self._dicionario.get((s,a),self._valor_omissao)
+        return self.memoria.get((s,a),self._valor_omissao)
