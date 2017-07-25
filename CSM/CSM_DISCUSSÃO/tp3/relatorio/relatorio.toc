@@ -1,0 +1,12 @@
+\select@language {portuguese}
+\contentsline {section}{\numberline {1}Introdu\IeC {\c c}\IeC {\~a}o}{3}
+\contentsline {section}{\numberline {2}Desenvolvimento}{4}
+\contentsline {subsection}{\numberline {2.1}Compress\IeC {\~a}o de imagens com perdas}{4}
+\contentsline {subsection}{\numberline {2.2}Codifica\IeC {\c c}\IeC {\~a}o/descodifica\IeC {\c c}\IeC {\~a}o baseada na DCT}{5}
+\contentsline {subsection}{\numberline {2.3}Codifica\IeC {\c c}\IeC {\~a}o/descodifica\IeC {\c c}\IeC {\~a}o baseada na DCT com quantifica\IeC {\c c}\IeC {\~a}o}{7}
+\contentsline {subsubsection}{\numberline {2.3.1}Resultados obtidos}{9}
+\contentsline {subsection}{\numberline {2.4}Codifica\IeC {\c c}\IeC {\~a}o/descodifica\IeC {\c c}\IeC {\~a}o com perdas JPEG baseada na DCT}{10}
+\contentsline {subsubsection}{\numberline {2.4.1}Codifica\IeC {\c c}\IeC {\~a}o de Huffman dos coeficientes DC}{11}
+\contentsline {subsubsection}{\numberline {2.4.2}Codifica\IeC {\c c}\IeC {\~a}o de Huffman dos coeficientes AC}{12}
+\contentsline {subsubsection}{\numberline {2.4.3}Resultados obtidos}{14}
+\contentsline {section}{\numberline {3}Conclus\IeC {\~o}es}{18}
