@@ -12,7 +12,7 @@ from pee.melhorprim.procura_sofrega import ProcuraSofrega
 from pee.melhorprim.procura_custo_unif import ProcuraCustoUnif
 
 
-psa.iniciar("amb/amb2.das")
+psa.iniciar("amb/amb1.das")
 
 procuraAA = ProcuraAA()
 procuraSof = ProcuraSofrega()

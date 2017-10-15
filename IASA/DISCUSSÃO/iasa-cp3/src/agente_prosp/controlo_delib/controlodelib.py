@@ -17,6 +17,7 @@ class ControloDelib(Controlo):
         #se nao houver objectivos, se nao houver planos, se o mundo mudar
         return not self._objectivos or not self._planeador.plano_pendente() \
             or self._modelo_mundo.alterado
+        # return self._modelo_mundo.alterado
 
     def _deliberar(self):
         #void

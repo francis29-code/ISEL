@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-#
 import numpy as np
 import cv2 as cv
 import matplotlib.pyplot as plt
@@ -66,20 +67,20 @@ def ex1():
 def ex2():
     #leitura da imagem incial
     img = readImage('lenac.tif')
-    #gravação das duas imagens com diferentes percentagens de qualidade
+    #gravacao das duas imagens com diferentes percentagens de qualidade
     saveImage('imagem',img,80)
     saveImage('imagem',img,10)
     #leitura das imagens gravadas
     img80 = readImage('imagem - 80.jpg')
     img10 = readImage('imagem - 10.jpg')
-    ## visualização das duas imagens gravadas
+    ## visualizacao das duas imagens gravadas
     showImage('Imagem 80', img80)
     showImage('Imagem 10', img10)
 
-    #um pequeno "waiting" para a visualização das imagens
+    #um pequeno "waiting" para a visualizacao das imagens
     cv.waitKey(0)
 
-    #taxa de compressão é a divisão entre a original e a comprimida
+    #taxa de compressao é a divisao entre a original e a comprimida
     ratio10 = compressionRatio('lenac.tif','imagem - 10.jpg')
     print("\nRatio da imagem 10: {}%".format(ratio10))
     ratio80 = compressionRatio('lenac.tif','imagem - 80.jpg')
