@@ -23,9 +23,14 @@ def smoothImage(image):
     erode = cv2.erode(image,matriz,iterations=1)
     return erode
 
-def centroides(image):
+def centroides(image,img):
     #apanhar os contornos de uma imagem binaria
-    contornos,hierarquia,lel = cv2.findContours(image,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+    contornos,hierarquia,LEL = cv2.findContours(image,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+
+
+
+    # cv2.drawContours(c,contornos,-1,(255,255,0),thickness=2)
+    # cv2.imshow("contornos",t)
     centroide = []
     cx = []
     cy = []
@@ -48,7 +53,7 @@ def distToCenter(centroide,cx,cy):
     counter =0
     #distance to center
     for x,y in zip(cx,cy):
-        classifica(cv2.contourArea(centroide[counter]))
+        # classifica(cv2.contourArea(centroide[counter]))
         distref = np.sqrt(cv2.contourArea(centroide[counter])/np.pi)
         distref = distref+mx
         distref2 = distref-(2*mx)
@@ -56,28 +61,39 @@ def distToCenter(centroide,cx,cy):
         filtered = filter(lambda f: True if (np.sqrt((f[0][0]-x)**2 + (f[0][1]-x)**2)>distref
         or np.sqrt((f[0][0]-x)**2 + (f[0][1]-x)**2)<distref2) else False, current)
         corrected.append(filtered)
+        # f = np.array(filtered)
+        classifica(cv2.contourArea(np.asarray(filtered)))
         counter+=1
+        # break
 
     return corrected
 
 def classifica(area):
     global valor
-    if(area>= 7000 and area<=10000):
+    if(area>= 0 and area<=6500):
         valor += moedas.get('0.01')
-    if(area>= 11000 and area<12000):
+    if(area>= 6500 and area<8800):
         valor += moedas.get('0.02')
-    if(area>= 14000 and area<=15000):
-        valor += moedas.get('0.05')
-    if(area>= 12000 and area<14000):
+    if(area>= 8800 and area<=10000):
         valor += moedas.get('0.10')
-    if(area> 15000 and area<=17000):
+    if(area>= 10000 and area<12000):
+        valor += moedas.get('0.05')
+    if(area> 12000 and area<=13500):
         valor += moedas.get('0.20')
-    if(area> 19000 and area<=23000):
-        valor += moedas.get('0.50')
-    if(area> 17000 and area<=19000):
+    if(area> 13500 and area<=14500):
         valor += moedas.get('1.00')
+    if(area> 14500 and area<=17500):
+        valor += moedas.get('0.50')
+
 
 def teste():
+
+    #ARC LENGTH DO contornos PERIMETOR
+    #CALCULAR area COM O CONTORNO
+    # CICULARIDADE = PERIMETOR**2 / AREA
+
+    #CIRCULRIDADE14 - 15
+
 
     #leitura da imagem em tons de cinzento
     img = cv2.imread('P1.jpg',cv2.IMREAD_GRAYSCALE)
@@ -87,12 +103,12 @@ def teste():
     # cv2.imshow('Imagem Melhorada',melhorada)
     #THRESH_TRIANGLE fica mais nitida - BINARIZACAO
     rt,thresh = imageBinary(melhorada)
-    cv2.imshow('Imagem Binarizada',thresh)
+    # cv2.imshow('Imagem Binarizada',thresh)
     #erosao
     erode = smoothImage(thresh)
-    cv2.imshow('Imagem Erodida',erode)
+    # cv2.imshow('Imagem Erodida',erode)
     #centroides
-    centroide,cx,cy = centroides(erode)
+    centroide,cx,cy = centroides(erode,img)
     #filtrar pontos que nao estao de acordo com o raio esperado
     array_final = distToCenter(centroide,cx,cy)
     cv2.waitKey(0)
