@@ -36,7 +36,7 @@ def tratamento_imagem(imagem_binarizada):
    return erosao
 
 def find_contours(imagem_tratada):
-    contornos,hierarquia = cv2.findContours(imagem_tratada, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    cenas,contornos,hierarquia = cv2.findContours(imagem_tratada, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     #filtra-se todos os contornos que tenham contornos dentro deles.
     array =[]
@@ -152,7 +152,7 @@ def array_To_String(array_area_find,distancia):
 
 if __name__ == "__main__":
 
-    image = cv2.imread('9.jpg')
+    image = cv2.imread('P3.jpg')
     cv2.imshow("Imagem Original",image)
 
     min_coin_area = 7000

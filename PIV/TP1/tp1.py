@@ -18,30 +18,29 @@ def imageBinary(image):
 def smoothImage(image):
     #TRATAMENTO DA IMAGEM
     #structuring element - uma imagem binaria
-    matriz = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(9,9))
+    matriz = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
     #dilate melhor que o erode, imagens das moedas ficam mais redondas
     erode = cv2.erode(image,matriz,iterations=1)
     return erode
 
-def centroides(image,img):
+def centroides(image):
     #apanhar os contornos de uma imagem binaria
-    contornos,hierarquia,LEL = cv2.findContours(image,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-
-
-
+    contornos,hierarquia,LEL = cv2.findContours(image,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    # h = filter(lambda c: True if ((c[0][x][2]!=-1) or(hierarquia[0][x][3]!=-1)) ,hierarquia)
     # cv2.drawContours(c,contornos,-1,(255,255,0),thickness=2)
     # cv2.imshow("contornos",t)
+    print LEL
     centroide = []
     cx = []
     cy = []
+    counter = 0
     for conta in hierarquia:
-        if cv2.contourArea(conta) > 7000:
-            momentos = cv2.moments(conta)
-            #m00 equivale a area = cv2.contourArea(conta)
-            if momentos['m00']!=0:
-                cx.append(int(momentos['m10']/momentos['m00']))
-                cy.append(int(momentos['m01']/momentos['m00']))
-                centroide.append(conta)
+        momentos = cv2.moments(conta)
+        #m00 equivale a area = cv2.contourArea(conta)
+        if momentos['m00']!=0:
+            cx.append(int(momentos['m10']/momentos['m00']))
+            cy.append(int(momentos['m01']/momentos['m00']))
+            centroide.append(conta)
     return centroide,cx,cy
 
 
@@ -58,14 +57,21 @@ def distToCenter(centroide,cx,cy):
         distref = distref+mx
         distref2 = distref-(2*mx)
         current = centroide[counter]
+
+        perimetro = cv2.arcLength(current,True)
+        area = cv2.contourArea(current)
+        print area
+        circularidade = perimetro**2/area
+        print circularidade
+        if(not (circularidade >= 14 and circularidade <= 15)):
+            continue
+
         filtered = filter(lambda f: True if (np.sqrt((f[0][0]-x)**2 + (f[0][1]-x)**2)>distref
         or np.sqrt((f[0][0]-x)**2 + (f[0][1]-x)**2)<distref2) else False, current)
         corrected.append(filtered)
-        # f = np.array(filtered)
         classifica(cv2.contourArea(np.asarray(filtered)))
         counter+=1
         # break
-
     return corrected
 
 def classifica(area):
@@ -96,19 +102,19 @@ def teste():
 
 
     #leitura da imagem em tons de cinzento
-    img = cv2.imread('P1.jpg',cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread('P3.jpg',cv2.IMREAD_GRAYSCALE)
     # cv2.imshow('Imagem Original',img)
     #smoothing a imagem - MELHORAMNETO
     melhorada = improveImage(img)
     # cv2.imshow('Imagem Melhorada',melhorada)
     #THRESH_TRIANGLE fica mais nitida - BINARIZACAO
     rt,thresh = imageBinary(melhorada)
-    # cv2.imshow('Imagem Binarizada',thresh)
+    cv2.imshow('Imagem Binarizada',thresh)
     #erosao
     erode = smoothImage(thresh)
     # cv2.imshow('Imagem Erodida',erode)
     #centroides
-    centroide,cx,cy = centroides(erode,img)
+    centroide,cx,cy = centroides(erode)
     #filtrar pontos que nao estao de acordo com o raio esperado
     array_final = distToCenter(centroide,cx,cy)
     cv2.waitKey(0)
