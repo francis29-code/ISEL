@@ -10,9 +10,25 @@ class DetectMotion:
         self.movimento = None
         self.zooming = False
         self.type_of_zoom = None
+        self.frame = 0
+        self.last_position = None
     
-    def checkVariation(self):
-        raise NotImplementedError
+    def checkVariation(self,image,centroid):
+        cv2.putText(image,"Movimento -> {0}".format(self.movimento),(30,200),2,1.,(255,255,255))
+        if(self.frame %10 !=0):
+            return
+
+        if(self.last_position is not None):
+            if(self.last_position[0] > centroid[0]):
+                self.movimento = "Esquerda"
+            elif(self.last_position[0] < centroid[0]):
+                self.movimento = "Direita"
+            elif(self.last_position[1] > centroid[1]):
+                self.movimento = "Cima"
+            elif(self.last_position[1] < centroid[1]):
+                self.movimento = "Baixo"
+
+        self.last_position = centroid
     
     def isZooming(self):
         return self.zooming
@@ -54,3 +70,6 @@ class DetectMotion:
     def getScalar(self,current_area):
         scalar = abs((DetectMotion.area_optima + DetectMotion.threshold)*1.-current_area*1.)
         return float(scalar/10000)
+    
+    def setFrame(self,frame):
+        self.frame = frame

@@ -59,6 +59,8 @@ class VideoCapture:
         self.findAndDrawCentroid()
         # self.drawConvexPoints()
         self.frame += 1
+        self.motion_detector.setFrame(self.frame)
+        self.motion_detector.checkVariation(self.image,self.getCentroidTuple())
         cv2.putText(self.image,"frame -> {0}".format(self.frame),(30,50),2,1.,(255,255,255))
         cv2.putText(self.image,"Area -> {0}".format(cv2.contourArea(self.contour)),(30,100),2,1.,(255,255,255))
         cv2.imshow("input",self.image)

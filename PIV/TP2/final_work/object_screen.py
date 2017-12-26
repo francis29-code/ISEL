@@ -5,7 +5,7 @@ import sys
 class ObjectScreen:
 
     backgroundColor = (255,200,50)
-    base_zoom_factor = 20
+    base_zoom_factor = 15
 
     def __init__(self,width,height,squareSize):
         self.width = width
