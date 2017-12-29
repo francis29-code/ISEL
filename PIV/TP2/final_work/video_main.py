@@ -4,21 +4,30 @@ from object_screen import *
 from detect_motion import *
 import pygame
 
-motion_detector = DetectMotion()
-video = VideoCapture(motion_detector)
-objectScreen = ObjectScreen(video.width,video.height,30)
-clock = pygame.time.Clock()
-fps = 120
+class VideoMain:
+    
+    clock = pygame.time.Clock()
+    fps = 120
 
-while (video.imageCaptureOpened()):
+    def __init__(self):
+        self.main = None
+        self.motion_detector = DetectMotion()
+        self.video = VideoCapture(self.motion_detector)
+        self.objectScreen = ObjectScreen(self.video.width,self.video.height,30)
+    
+    def video_loop(self):
+        while (self.video.imageCaptureOpened()):
 
-    video.process()
-    objectScreen.update(video.getCentroidTuple(),motion_detector.isZooming(),
-    motion_detector.typeOfZoom(),motion_detector.getScalar(video.getCurrentArea()))
+            self.video.process()
+            self.objectScreen.update(self.video.getCentroidTuple(),self.motion_detector.isZooming(),
+            self.motion_detector.typeOfZoom(),self.motion_detector.getScalar(self.video.getCurrentArea()))
 
-    k = cv2.waitKey(10)
-    if k == 27:
-        break
+            k = cv2.waitKey(10)
+            if k == 27:
+                break
 
-    clock.tick(fps)
+            VideoMain.clock.tick(VideoMain.fps)
 
+if __name__ == "__main__":
+    video_main = VideoMain()
+    video_main.video_loop()

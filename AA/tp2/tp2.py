@@ -233,42 +233,6 @@ plt.xlabel('False Positive Rate')
 ##print 'Prob Acertos: %.2f' %(results*100.)
 #print np.round(score, 2)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Não dá para fazer com média nula porque com 25k dá memoryError, mas para a distancia 
 ## Com média nula
 #Xn = (stemVocabTrainTrimmedTransform.T - np.mean(stemVocabTrainTrimmedTransform.toarray(), 1)).T
