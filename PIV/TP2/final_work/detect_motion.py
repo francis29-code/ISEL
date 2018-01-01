@@ -19,13 +19,13 @@ class DetectMotion:
             return
 
         if(self.last_position is not None):
-            if(self.last_position[0] > centroid[0]):
+            if(self.last_position[0] > centroid[0] and (abs(self.last_position[1] - centroid[1])<70)):
                 self.movement = "Direita"
-            elif(self.last_position[0] < centroid[0]):
+            if(self.last_position[0] < centroid[0] and (abs(self.last_position[1] - centroid[1])<70)):
                 self.movement = "Esquerda"
-            elif(self.last_position[1] > centroid[1]):
+            if(self.last_position[1] > centroid[1] and (abs(self.last_position[0] - centroid[0])<70)):
                 self.movement = "Cima"
-            elif(self.last_position[1] < centroid[1]):
+            if(self.last_position[1] < centroid[1] and (abs(self.last_position[0] - centroid[0])<70)):
                 self.movement = "Baixo"
 
         self.last_position = centroid
