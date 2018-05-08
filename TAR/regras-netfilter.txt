@@ -1,0 +1,26 @@
+Modulo conntrack:
+- NEW - new connections to be created
+- ESTABLISHED - part of an existing connection
+- RELATED - assigned to a packet that is initiating a new connection and which that
+is expected.
+- INVALID - packet is invalid
+- UNTRACKED - special state that can be assigned.
+
+Internet -> router (destinado ao router)
+- Todo o trafego considerado INVALID é negado:
+iptables -A INPUT -s 0.0.0.0 -m conntrack --cstate INVALID -j DROP
+
+- Todo o trafego relacionado e associado ao router com origem no mesmo
+iptables -A INPUT -s 0.0.0.0 -m conntrack --cstate ESTABLISHED,RELATED -j ACCEPT
+
+- Estabelece ligações apenas nos portos 80 HTTP ou 22 SSH
+iptables -A INPUT -s 0.0.0.0 -p tcp --dport 80 --sport 80 -j ACCEPT
+iptables -A INPUT -s 0.0.0.0 -p tcp --dport 22 --sport 22 -j ACCEPT
+
+- Tentativas de ligação ao porto 25 smtp, registades, rejeitadas e devolvidas mensagem tcp/rst
+iptables -A INPUT -s 0.0.0.0 -p tcp --dport 25 --sport 25 -j REJECT,LOG --reject tcp-rst
+
+- so são aceites 10 mensagens de ICMP echo request por minuto , rajada 20
+iptables -A INPUT -s 0.0.0.0 -p icmp 
+
+	
